@@ -1,0 +1,147 @@
+---
+title: "PCA"
+author: "Pietro Franceschi"
+date: "January 22, 2018"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  fig.path = "figs/figs"
+)
+```
+
+In this second demo we go really multivariate applying PCA to the analysis of some of the dataset we described in the univariate visualization tutorial.
+
+PCA in R can be performed with many different packages, here we will use two of them which are characterized by an optimal tradeoff between flexibility and ease to use. The two packages are `FactoMineR` and `factoextra`. An excellent introduction to their use can be found [there](http://www.sthda.com/english/wiki/factoextra-r-package-easy-multivariate-data-analyses-and-elegant-visualization)
+
+
+Both packages are not part of the standard R installation. To directly install them just type
+```{r eval=FALSE}
+install.packages("FactoMineR")
+install.packages("Factoextra")
+```
+
+
+## PCA of the Iris  Dataset
+As before we start with the iris dataset. First of all er load the data and the two R packages
+
+```{r}
+library(FactoMineR)
+library(factoextra)
+data(iris)
+head(iris)
+```
+
+
+The first step is now to perform the PCA on this dataset, in a sense this application is trivial because we have only four variables. However
+
+```{r}
+
+## This code performs the PCA on the unit variance scalde data
+irisPCA <- PCA(iris[,1:4],
+               scale.unit = TRUE,
+               graph = FALSE)
+## as usual the summary function returns an informative textual summary of the results
+summary(irisPCA)
+```
+
+Let's look to some elements of the outputs:
+
+* The **Call** part shows the PCA call
+* The **Eigenvalues** part is the one showing the characteristics of the PCs. Here we have four PCs, and the first two together account for the 95% of the variance. Looking to the PC1XPC2 plane we expect then to have a quite representative model of the multivariate variance of our data.
+* The **Individuals** speaks about the samples (only the first ten), so it contains the information on the __scores__
+* The **Variables** part shows the weight of the "old" variable in the "new" direction. As an example we see that Petal.Length has a very low "weight" along the second PC (Dim.2). This part of the output describes the __loadings__. For the moment we disregard the other columns
+
+
+As we discussed, the number of PCs to be considered to reconstruct a reasonably accurate representation of my data can be decided by considering the __screeplot__
+
+
+```{r}
+fviz_screeplot(irisPCA, addlabels = TRUE)
+```
+
+
+The graphical output tells us more or less what the text summary was suggesting. Two PCs should give a fair good picture of the data.
+Let's look to the PCA scoreplot
+
+```{r}
+fviz_pca_ind(irisPCA, 
+             habillage = iris$Species ,  ## use the specie as a color for the display
+             label = "none", # hide individual labels
+             repel = TRUE # Avoid text overlapping (slow if many points)
+             )
+```
+
+The plot show the position of the samples on the PC1 X PC2 plane. Each point is a sample. The plot can be further customized. To do that look to the STHDA website mentioned earlier, or to the help of the function `help(fviz_pca_ind)`.
+
+**Observations**
+
+* The separation between setosas and the other cultivars is bigger
+* Dim1 is sufficient to clearly distinguish the three cultivars
+* ...
+
+
+The scoreplot gives only "half" of the infos resulting from the PCA, in fact it shows only the position of the individuals. In real life applications, however, we are also interested in the contribution of the old variables to the PCs. This is the content of the loadingsplot
+
+
+```{r}
+fviz_pca_var(irisPCA, col.var="contrib",
+             gradient.cols = c("gray70", "coral3"),
+             repel = TRUE # Avoid text overlapping
+             )
+```
+
+
+This plot is also extremely informative. The shade of color highlights the contribution of the four initial variables on PC1 and PC2. Sepal.Width is important for PC2, while the other variables are more influential on PC1. Out of the "horizontal" three, Petal.Length is the one with the strongest weight on PC1. The direction of the arrows also tells that Petal.Width and Petal.Length are highly correlated (pointing on the same direction), while Sepal.Length and Sepal.Width are not correlated. 
+
+On this aspect, however, remember that we are here looking only to a projection of the overall space and correlation/non correlation could arise only for projetive reasons.
+
+It is common to integrate the two previous plots into one single visualization called __biplot__
+
+```{r}
+fviz_pca_biplot(irisPCA, 
+                habillage = iris$Species,
+                label = "var", # show variable names
+                repel = TRUE)
+```
+
+
+This combined visualization allows also to identify the trends of the variables across the samples. The arrows are indeed pointing towards the sample showing an higher value of that specific variable. In our case, for example, Petal.Length is higher in virginica and lower in setosa.
+
+
+The last point I would like to touch in this demo is dependence of the PCA projection from the data. As discussed during the class, the characteristics of the PCA projection will change if new individuals are added to the dataset. For this reason, it is not always straightforward to compare two different PCAs. In order to show that, let's compare the previous representation with a new one were the initial PCA was performed only on versicolor and virginica.
+
+```{r}
+
+irissmall <- iris[iris$Species != "setosa",]
+
+smallPCA <- PCA(irissmall[,1:4],
+                scale.unit = TRUE,
+                graph = FALSE)
+fviz_pca_biplot(smallPCA, 
+                habillage = irissmall$Species,
+                label = "var", # show variable names
+                repel = TRUE)
+
+
+```
+
+
+As you can see the representation is slightly different. Could you look to the loadings plot?
+
+
+## Its your turn ...
+
+* Compare the outputs of the PCA analysis of the iris with the biplot of the initial variables. Is the picture coherent?
+* Run a PCA analysis on the wines dataset. There it is also interesting to play with the scaling of the data. Try, for example, to substitute the UV scaling with a log scaling or run PCA without scaling. What do you see
+* Try to run the PCA analysis of the RNAseq data ... is it working?
+
+
+
+
+
+
+
+
