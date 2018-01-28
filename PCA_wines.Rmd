@@ -1,0 +1,178 @@
+---
+title: "PCA"
+author: "Pietro Franceschi"
+date: "January 28, 2018"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  fig.path = "figs/figs"
+)
+```
+
+This demo still deals with PCA. In particular we apply it to the wines dataset.
+
+PCA in R can be performed with many different packages, here we will use two of them which are characterized by an optimal trade off between flexibility and ease to use. The two packages are `FactoMineR` and `factoextra`. An excellent introduction to their use can be found [there](http://www.sthda.com/english/wiki/factoextra-r-package-easy-multivariate-data-analyses-and-elegant-visualization)
+
+
+Both packages are not part of the standard R installation. To directly install them just type
+```{r eval=FALSE}
+install.packages("FactoMineR")
+install.packages("Factoextra")
+```
+
+
+## PCA of Wines  Dataset
+First of all we load the data and the two R packages
+
+```{r}
+library(FactoMineR)
+library(factoextra)
+load("wines.RData")
+head(wines)
+```
+
+
+
+Since this `wines` is a matrix, we transform it to a data frame adding also the info about the wine type
+
+```{r}
+winesdf <- cbind.data.frame(class = vintages, wines)
+str(winesdf)
+```
+
+Now we see more clearly the structure of the data, and we can easily use the summary to get some feeling on the situation
+
+
+```{r}
+summary(winesdf)
+```
+
+Let's do some PCA, first of all consider the scaled and unscaled results 
+
+```{r}
+winesPCA.scaled <- PCA(winesdf[,2:14],
+                       scale.unit = TRUE,
+                       graph = FALSE)
+fviz_pca_biplot(winesPCA.scaled, 
+                habillage = winesdf$class,
+                label = "var", # show variable names
+                repel = TRUE) 
+```
+
+```{r}
+winesPCA <- PCA(winesdf[,2:14],
+                scale.unit = FALSE,
+                graph = FALSE
+                ) 
+fviz_pca_biplot(winesPCA, 
+                habillage = winesdf$class,
+                label = "var", # show variable names
+                repel = TRUE) 
+```
+
+Now some questions:
+
+* What can you see about the sample wines? 
+* What can you say about the relations (correlation) between the variables?
+* Which are the most discriminating variables?
+* Why the two previous plots are so different?
+
+
+Let's give a look to the scaled and unscaled raw data ...
+
+```{r}
+stripchart(winesdf[,2:14],
+           vertical = TRUE,
+           method = "jitter",
+           jitter = 0.2,
+           pch = 19,
+           col = "red3",
+           cex = 0.3)
+```
+
+
+And their scale counterpart ...
+
+
+```{r}
+stripchart(as.data.frame(scale(winesdf[,2:14])),
+           vertical = TRUE,
+           method = "jitter",
+           jitter = 0.2,
+           pch = 19,
+           col = "red3",
+           cex = 0.3)
+abline(h=0)
+```
+
+
+
+## PCA of the gene expression data
+
+To finish this part let's give a fat look to the gene expression data ...
+
+```{r}
+## Load the data
+load("rnaseq.RData")
+
+dim(countsn)
+
+```
+
+So here we have 12 samples and more than 12 thousands variables, and samples are in column. First of all we have to turn the matrix
+
+```{r}
+countsn <- t(countsn)
+
+dim(countsn)
+
+```
+
+
+Let's give a look to the PCA
+
+```{r}
+genesPCA <- PCA(countsn,
+                scale.unit = TRUE,
+                graph = FALSE)
+summary(genesPCA)
+```
+
+
+What we see in terms of variance?
+
+```{r}
+fviz_pca_biplot(genesPCA, 
+                label = "none") 
+```
+
+
+
+Olalà! 
+
+* Why this plot? 
+* What is telling us? 
+* Is something unexpected?
+
+## Projections
+We mentioned that to compare new and old data by PCA the "new" samples should be projected on the old PCA, otherwise the projection plane will be different. This is the most wise way to assess if new samples are compatible with the old ones. Let's see how this can be done on the wines dataset.
+
+To this purpose we project the "Barolo" samples on the PCA costructed on the rest of the dataset
+
+```{r}
+proj.winesPCA <-PCA(winesdf[,2:14],
+                       scale.unit = TRUE,
+                       graph = FALSE,
+                       ind.sup = which(winesdf$class == "Barolo"))
+fviz_pca_biplot(proj.winesPCA, 
+                habillage = winesdf$class[!winesdf$class == "Barolo"],
+                label = "var", # show variable names
+                repel = TRUE) 
+
+
+```
+
+The new individuals are in blue, as you can see the picture is now different compared to the one obtained with the full PCA. What we can say, now, is that Barolo samples are more similar to Grignolino than Barbera, but remember that this is true only because we look to a projection that is different from the old one. The data, indeed, always occupy the same position in the 14 dimensional space of the variables
