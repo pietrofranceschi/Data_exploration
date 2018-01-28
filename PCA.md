@@ -5,7 +5,7 @@ January 22, 2018
 
 In this second demo we go really multivariate applying PCA to the analysis of some of the dataset we described in the univariate visualization tutorial.
 
-PCA in R can be performed with many different packages, here we will use two of them which are characterized by an optial tradoff between flexibility and ease to use. The two packages are `FactoMineR` and `factoextra`. An excellent introduction to their use can be found [there](http://www.sthda.com/english/wiki/factoextra-r-package-easy-multivariate-data-analyses-and-elegant-visualization)
+PCA in R can be performed with many different packages, here we will use two of them which are characterized by an optimal tradeoff between flexibility and ease to use. The two packages are `FactoMineR` and `factoextra`. An excellent introduction to their use can be found [there](http://www.sthda.com/english/wiki/factoextra-r-package-easy-multivariate-data-analyses-and-elegant-visualization)
 
 Both packages are not part of the standard R installation. To directly install them just type
 
@@ -112,7 +112,7 @@ As we discussed, the number of PCs to be considered to reconstruct a reasonably 
 fviz_screeplot(irisPCA, addlabels = TRUE)
 ```
 
-![](figs/figsunnamed-chunk-4-1.png)
+![](figs/pcaunnamed-chunk-4-1.png)
 
 The graphical output tells us more or less what the text summary was suggesting. Two PCs should give a fair good picture of the data. Let's look to the PCA scoreplot
 
@@ -124,17 +124,17 @@ fviz_pca_ind(irisPCA,
              )
 ```
 
-![](figs/figsunnamed-chunk-5-1.png)
+![](figs/pcaunnamed-chunk-5-1.png)
 
 The plot show the position of the samples on the PC1 X PC2 plane. Each point is a sample. The plot can be further customized. To do that look to the STHDA website mentioned earlier, or to the help of the function `help(fviz_pca_ind)`.
 
 **Observations**
 
--   The separation between setosas and the other cultivrs is bigger
+-   The separation between setosas and the other cultivars is bigger
 -   Dim1 is sufficient to clearly distinguish the three cultivars
 -   ...
 
-The scoreplot gives only "half" of the infos resulting from the PCA, in fact it shows only the posistion of the individuals. In real life applications, however, we are also interested in the contribution of the old variables to the PCs. This is the content of the loadingsplot
+The scoreplot gives only "half" of the infos resulting from the PCA, in fact it shows only the position of the individuals. In real life applications, however, we are also interested in the contribution of the old variables to the PCs. This is the content of the loadingsplot
 
 ``` r
 fviz_pca_var(irisPCA, col.var="contrib",
@@ -143,9 +143,9 @@ fviz_pca_var(irisPCA, col.var="contrib",
              )
 ```
 
-![](figs/figsunnamed-chunk-6-1.png)
+![](figs/pcaunnamed-chunk-6-1.png)
 
-This plot is also extremely informative. The shade of color highlights the contribution of the four initial variables on PC1 and PC2. Sepal.Width is important for PC2, while the other variables are more influential on PC1. Out of the "horizontal" three, Petal.Length is the one with the strongest weight on PC1. The direction of the arrowa also tells that Petal.Width and Petal.Length are highly correlated (pointing on the same direction), while Sepal.Length and Sepal.Width are not correlated.
+This plot is also extremely informative. The shade of color highlights the contribution of the four initial variables on PC1 and PC2. Sepal.Width is important for PC2, while the other variables are more influential on PC1. Out of the "horizontal" three, Petal.Length is the one with the strongest weight on PC1. The direction of the arrows also tells that Petal.Width and Petal.Length are highly correlated (pointing on the same direction), while Sepal.Length and Sepal.Width are not correlated.
 
 On this aspect, however, remember that we are here looking only to a projection of the overall space and correlation/non correlation could arise only for projetive reasons.
 
@@ -158,11 +158,11 @@ fviz_pca_biplot(irisPCA,
                 repel = TRUE)
 ```
 
-![](figs/figsunnamed-chunk-7-1.png)
+![](figs/pcaunnamed-chunk-7-1.png)
 
-This combined visualization allows also to identify the trends of the variables across the samples. The arrows are indeed pointing towards the sample showing an higher value of eac specific variable. In our case, for example, Petl.Length is higher in virginica and lower in setosa.
+This combined visualization allows also to identify the trends of the variables across the samples. The arrows are indeed pointing towards the sample showing an higher value of that specific variable. In our case, for example, Petal.Length is higher in virginica and lower in setosa.
 
-The last point I would like to touch in this demo is dependence of the PCA projection from the data. As discussed during the class, the characteristics of the PCA projection will change if new individuals are added to the dataset. For this reason, it is not always strightforward to compare two different PCAs. In order to show that, le'ts compare the previous representation with a new one were the initial PCA was performed only on versicolor and virginica.
+The last point I would like to touch in this demo is dependence of the PCA projection from the data. As discussed during the class, the characteristics of the PCA projection will change if new individuals are added to the dataset. For this reason, it is not always straightforward to compare two different PCAs. In order to show that, let's compare the previous representation with a new one were the initial PCA was performed only on versicolor and virginica.
 
 ``` r
 irissmall <- iris[iris$Species != "setosa",]
@@ -176,7 +176,7 @@ fviz_pca_biplot(smallPCA,
                 repel = TRUE)
 ```
 
-![](figs/figsunnamed-chunk-8-1.png)
+![](figs/pcaunnamed-chunk-8-1.png)
 
 As you can see the representation is slightly different. Could you look to the loadings plot?
 
@@ -184,5 +184,5 @@ Its your turn ...
 -----------------
 
 -   Compare the outputs of the PCA analysis of the iris with the biplot of the initial variables. Is the picture coherent?
--   Run a PCa analysis on the wines dataset. There it is also interesting to play with the scaling of the data. Try, for example, to substitute the UV scaling with a log scaling or run PCA without scaling. What do you see
+-   Run a PCA analysis on the wines dataset. There it is also interesting to play with the scaling of the data. Try, for example, to substitute the UV scaling with a log scaling or run PCA without scaling. What do you see
 -   Try to run the PCA analysis of the RNAseq data ... is it working?

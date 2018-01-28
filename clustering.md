@@ -24,7 +24,7 @@ plot(g1)
 plot(g2)
 ```
 
-![](figs/figsunnamed-chunk-1-1.png)
+![](figs/clusteringunnamed-chunk-1-1.png)
 
 Agglomerative Clustering
 ------------------------
@@ -45,7 +45,7 @@ classes <- rep(c(1,2), each = 20)
 plot(toydata, pch = classes, col = classes, xlab = "Var 1", ylab = "Var 2")
 ```
 
-![](figs/figsunnamed-chunk-2-1.png)
+![](figs/clusteringunnamed-chunk-2-1.png)
 
 As discussed in the presentation, to perform clustering it is necessary to define a distance measure Let's look to the matrix and is size for the toy dataset
 
@@ -55,8 +55,8 @@ toy.dist <- dist(toydata)
 summary(toy.dist)
 ```
 
-    ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-    ##  0.01417  2.09516  4.32163  4.74904  7.14678 12.18308
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##  0.1282  2.1001  4.0299  4.4670  6.4176 13.4461
 
 ``` r
 dim(as.matrix(toy.dist))
@@ -68,7 +68,7 @@ dim(as.matrix(toy.dist))
 heatmap(as.matrix(toy.dist))
 ```
 
-![](figs/figsunnamed-chunk-4-1.png)
+![](figs/clusteringunnamed-chunk-4-1.png)
 
 We have clearly two groups, but this is what we expect
 
@@ -76,7 +76,7 @@ We have clearly two groups, but this is what we expect
 heatmap(as.matrix(dist(toydata, method = "manhattan")))
 ```
 
-![](figs/figsunnamed-chunk-5-1.png)
+![](figs/clusteringunnamed-chunk-5-1.png)
 
 The heatmap is not changing radically, but it is not the same and this demonstrate the importance of a principled choice of the distance (dissimilarity) measure.
 
@@ -89,7 +89,7 @@ plot(toy.complete, labels = classes)
 abline(h = 4, col = "red")
 ```
 
-![](figs/figsunnamed-chunk-6-1.png)
+![](figs/clusteringunnamed-chunk-6-1.png)
 
 The red horizontal line represent an arbitrary cut, the labels are the classes. As expected, in this easy example, the dendrogram shows two clear groups, which coincide with the initial classes
 
@@ -101,7 +101,7 @@ toy.single <- hclust(toy.dist, method = "single")
 plot(toy.single, labels = classes)
 ```
 
-![](figs/figsunnamed-chunk-7-1.png)
+![](figs/clusteringunnamed-chunk-7-1.png)
 
 Also in this case the two groups structure is clear, but, another time, remember that this is a really easy case.
 
@@ -117,8 +117,8 @@ table(mycut,classes)
 
     ##      classes
     ## mycut  1  2
-    ##     1 18  0
-    ##     2  2 20
+    ##     1 20  0
+    ##     2  0 20
 
 The Iris dataset
 ----------------
@@ -137,7 +137,7 @@ iris.complete <- hclust(dist(iris[,1:4]))
 plot(iris.complete, hang = -1, cex = 0.3, labels = iris$Species)
 ```
 
-![](figs/figsunnamed-chunk-10-1.png)
+![](figs/clusteringunnamed-chunk-10-1.png)
 
 This is clearly not the optimal visualization ... if you want prettier plot please look there [there](http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning#plot.dendrogram-function). Beyond aesthetics, we already see that here the situation is less clear than before. How many groups? In addition the scaling of the variables could also make a difference ...
 
@@ -147,7 +147,7 @@ iris.complete.s <- hclust(dist(scale(iris[,1:4])))
 plot(iris.complete.s, hang = -1, cex = 0.3, labels = iris$Species)
 ```
 
-![](figs/figsunnamed-chunk-11-1.png)
+![](figs/clusteringunnamed-chunk-11-1.png)
 
 Is this what you expect?
 
@@ -174,7 +174,7 @@ fviz_dend(iris.complete.s,
           label_cols =  as.numeric(iris$Species)[iris.complete.s$order])    ## color for the labels
 ```
 
-![](figs/figsunnamed-chunk-12-1.png)
+![](figs/clusteringunnamed-chunk-12-1.png)
 
 **DIY HC assignments**
 
@@ -203,8 +203,8 @@ table(classes, toy.km$cluster)
 
     ##        
     ## classes  1  2  3
-    ##       1  0 18  2
-    ##       2 13  0  7
+    ##       1  0 20  0
+    ##       2  7  0 13
 
 If you run it several times, the result of the clustering is different!!
 
@@ -213,7 +213,7 @@ If you run it several times, the result of the clustering is different!!
 plot(toydata, col = toy.km$cluster, pch = classes)
 ```
 
-![](figs/figsunnamed-chunk-14-1.png)
+![](figs/clusteringunnamed-chunk-14-1.png)
 
 As you can see a third cluster is identified ... but this is not unexpected since we are not asking ourselves which is the optimal number of clusters, but we are only dividing the data in three groups.
 
@@ -233,7 +233,7 @@ for (i in 1:9){
 plot(seq(1,9), wSS, type = "b")
 ```
 
-![](figs/figsunnamed-chunk-15-1.png)
+![](figs/clusteringunnamed-chunk-15-1.png)
 
 -   The `nstart` argument used before is a way to find the "best" solution for a given number of clusters (we know that different starting points can give different results also for the same number of clusters)
 -   The wSS drops from one to two and then it stays almost constant ... this is a good indication of the presence of two clusters, but remember that here we have only two variables ...
@@ -272,7 +272,7 @@ km.res <- kmeans(iris.scaled, 3, nstart = 50)
 fviz_cluster(km.res, iris[, -5], palette = "Set2", ggtheme = theme_minimal())
 ```
 
-![](figs/figsunnamed-chunk-17-1.png)
+![](figs/clusteringunnamed-chunk-17-1.png)
 
 This is nice, but better would be to have the initial labels ... in textual form this can be seen like this
 
@@ -298,7 +298,7 @@ for (i in 1:9){
 plot(seq(1,9), wSS, type = "b")
 ```
 
-![](figs/figsunnamed-chunk-19-1.png)
+![](figs/clusteringunnamed-chunk-19-1.png)
 
 As you see here the plot is less informative. It is not easy to decide how many clusters we see. two seems to be the best choice, as the previous plot indicates.
 

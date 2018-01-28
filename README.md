@@ -6,3 +6,7 @@ Material for the practical sessions of the Data Exploration Course
 
 ## Principal Component Analysis
 [PCA](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/PCA.md)
+[PCA on the Wines](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/PCA_wines.md)
+
+## Clustering
+[Clustering](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/clustering.md)

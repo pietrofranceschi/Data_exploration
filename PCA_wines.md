@@ -125,7 +125,7 @@ fviz_pca_biplot(winesPCA.scaled,
                 repel = TRUE) 
 ```
 
-![](figs/figsunnamed-chunk-5-1.png)
+![](figs/pcawinesunnamed-chunk-5-1.png)
 
 ``` r
 winesPCA <- PCA(winesdf[,2:14],
@@ -138,7 +138,7 @@ fviz_pca_biplot(winesPCA,
                 repel = TRUE) 
 ```
 
-![](figs/figsunnamed-chunk-6-1.png)
+![](figs/pcawinesunnamed-chunk-6-1.png)
 
 Now some questions:
 
@@ -159,7 +159,7 @@ stripchart(winesdf[,2:14],
            cex = 0.3)
 ```
 
-![](figs/figsunnamed-chunk-7-1.png)
+![](figs/pcawinesunnamed-chunk-7-1.png)
 
 And their scale counterpart ...
 
@@ -174,7 +174,7 @@ stripchart(as.data.frame(scale(winesdf[,2:14])),
 abline(h=0)
 ```
 
-![](figs/figsunnamed-chunk-8-1.png)
+![](figs/pcawinesunnamed-chunk-8-1.png)
 
 PCA of the gene expression data
 -------------------------------
@@ -279,7 +279,7 @@ fviz_pca_biplot(genesPCA,
                 label = "none") 
 ```
 
-![](figs/figsunnamed-chunk-12-1.png)
+![](figs/pcawinesunnamed-chunk-12-1.png)
 
 Olalà!
 
@@ -305,6 +305,6 @@ fviz_pca_biplot(proj.winesPCA,
                 repel = TRUE) 
 ```
 
-![](figs/figsunnamed-chunk-13-1.png)
+![](figs/pcawinesunnamed-chunk-13-1.png)
 
 The new individuals are in blue, as you can see the picture is now different compared to the one obtained with the full PCA. What we can say, now, is that Barolo samples are more similar to Grignolino than Barbera, but remember that this is true only because we look to a projection that is different from the old one. The data, indeed, always occupy the same position in the 14 dimensional space of the variables

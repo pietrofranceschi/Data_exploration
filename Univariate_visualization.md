@@ -109,7 +109,7 @@ boxplot(iris[,1:4],             ## plot only the first 4 columns
 )
 ```
 
-![](figs/figsunnamed-chunk-7-1.png)
+![](figs/univariateunnamed-chunk-7-1.png)
 
 What we see here
 
@@ -128,7 +128,7 @@ stripchart(iris[,1:4],                     ## only the variables
            cex = 0.7)                      ## size
 ```
 
-![](figs/figsunnamed-chunk-8-1.png)
+![](figs/univariateunnamed-chunk-8-1.png)
 
 The picture looks more intriguing than before ... the variable which was showing an asymmetric distribution
 
@@ -151,7 +151,7 @@ stripchart(`Petal.Length`~Species,         ## The ` are required because there a
            cex = 0.7)                      ## size
 ```
 
-![](figs/figsunnamed-chunk-9-1.png)
+![](figs/univariateunnamed-chunk-9-1.png)
 
 As `boxplot`
 
@@ -161,7 +161,7 @@ boxplot(`Petal.Length`~Species,
            col = "steelblue")
 ```
 
-![](figs/figsunnamed-chunk-10-1.png)
+![](figs/univariateunnamed-chunk-10-1.png)
 
 This plot clearly shows that `Petal.Length` is actually a bio-marker which differentiates the three varieties ... in this sense, then what I'm doing now it is not optimal ... or not? What do you think?
 
@@ -174,7 +174,7 @@ qqnorm(iris$Sepal.Length)
 qqline(iris$Sepal.Length)
 ```
 
-![](figs/figsunnamed-chunk-11-1.png)
+![](figs/univariateunnamed-chunk-11-1.png)
 
 As you see the data distribution does not really agree with a normal one. But remember that the samples are in fact the sum of three species, so normality is not an expected result.
 
@@ -184,7 +184,7 @@ qqplots are better that histograms to compare distributions (they can be used al
 hist(iris$Sepal.Length, col = "red", breaks = 20)
 ```
 
-![](figs/figsunnamed-chunk-12-1.png)
+![](figs/univariateunnamed-chunk-12-1.png)
 
 The histogram suggests that the distribution has a shoulder on the right, but from this plot it is hard to draw conclusions on the distributions.
 
@@ -195,7 +195,7 @@ pairs(iris[,1:4],                          ## consider only the numeric variable
       col = as.numeric(iris$Species))      ## transform the specie factor to a number ... which will be used as color
 ```
 
-![](figs/figsunnamed-chunk-13-1.png)
+![](figs/univariateunnamed-chunk-13-1.png)
 
 If you are interested in making the plot prettier, here some hints
 
@@ -207,7 +207,7 @@ pairs(iris[,1:4],
       pch = 19)
 ```
 
-![](figs/figsunnamed-chunk-14-1.png)
+![](figs/univariateunnamed-chunk-14-1.png)
 
 This plot immediately give us the feeling of the power of multivariate statistics.
 
@@ -243,7 +243,7 @@ plot(gasoline$NIR[1,],      ## plot the first line of the NIR table
      type = "l")            ## with a line
 ```
 
-![](figs/figsunnamed-chunk-16-1.png)
+![](figs/univariateunnamed-chunk-16-1.png)
 
 ``` r
 ## The overall dataset
@@ -252,7 +252,7 @@ matplot(t(gasoline$NIR), ## here the t() transposes the matrix because the matpl
         xlab = "wavelength") ## add also the x axis label
 ```
 
-![](figs/figsunnamed-chunk-17-1.png)
+![](figs/univariateunnamed-chunk-17-1.png)
 
 The data look fairly comparable, what we see is that there is a strong intensity difference between the high intensity wavelengths (like 390) and the "low intensity" regions, like 50.
 
@@ -268,7 +268,7 @@ matplot(log10(mymat), ## here the t() transposes the matrix because the matplot 
         xlab = "wavelength") ## add also the x axis label
 ```
 
-![](figs/figsunnamed-chunk-18-1.png)
+![](figs/univariateunnamed-chunk-18-1.png)
 
 Now the plot is more interesting. The variability is bigger on low intensity areas.
 
