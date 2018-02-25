@@ -29,9 +29,9 @@ myttest$p.value
 
 ```
 
-If I run the previous chunk several times, you will see that the number is changing and, if you are sufficiently patient, evetually you will find what you would identify as a significant difference 
+If I run the previous chunk several times, you will see that the number is changing and, if you are sufficiently patient, eventually you will find what you would identify as a significant difference 
 
-Now, if you are measuring several properties on the same set of samples (protein concentration, metabolite levels, bacterial abundances), you are in substance running "in parallel" a battery of tests, so it is obvious that you could find low p-values only by chance
+Now, if you are measuring several properties on the same set of samples (protein concentration, metabolite levels, bacterial abundances), you are in substance running "in parallel" a battery of tests, so it is obvious that you could find low p-values only by chance. This phenomenon is called **multiple testing issue**
 
 ```{r}
 ## 10000 tests (measuring 10000 metabolites)
@@ -61,4 +61,83 @@ hist(ps, col = "steelblue", main = "p-vals", breaks = 100)
 
 
 ## Real Dataset
+
+The dataset contains the results of a metabolomics investigation which was looking to the differences between yellow and red raspberries. 
+
+```{r}
+load("rubusFilledSmall.RData")
+
+## size of the dataset
+dim(rubusFilledSmall)
+
+## top rows
+rubusFilledSmall[1:10,1:10]
+```
+
+Now we run the same t-test on all the 500 "metabolites" and we look to the shape of the distribution of p-values
+
+```{r}
+ps <- rep(0,500)
+for(i in 1:500){
+  ## my t-test
+  myttest <- t.test(rubusFilledSmall[rubusFilledSmall$color=="R",i+1],
+                    rubusFilledSmall[rubusFilledSmall$color=="Y",i+1])
+  ps[i] <- myttest$p.value
+
+}
+
+ps[1:30]
+```
+
+and now the histogram ...
+
+
+```{r}
+hist(ps, col = "steelblue", main = "p-vals", breaks = 20)
+```
+
+what we see here is that above a uniform background of uniform p-values, there is a clear increase of low p-values. Some important observations on that
+
+* this is telling us that red and yellow berries shows an higher number of significantly different metabolites than what we would expect by chance
+* we cannot however say which one of the "low p-value" metabolites is different for real biological reasons or by chance. to do that we should rely on external metabolic knowledge
+
+
+Only as a "extra" validation we give a look to the previous histogram if we shuffle the color labels of the samples
+
+```{r}
+ps1 <- rep(0,500)
+for(i in 1:500){
+  ## my t-test
+  mylabels <- sample(rubusFilledSmall[,1])
+  myttest <- t.test(rubusFilledSmall[mylabels=="R",i+1],rubusFilledSmall[mylabels=="Y",i+1])
+  ps1[i] <- myttest$p.value
+
+}
+
+hist(ps1, col = "steelblue", main = "p-vals", breaks = 20)
+
+```
+
+and yes, now the distribution is uniform, clearly suggesting that yellow and red berries are significantly different
+
+## Controlling FDR
+Since it is not possible to distinguish between "real" and "false" discoveries only on the bases of the calculated p-values, the best one can do is to select a subset of the low ps which contain a well defined fraction of false discoveries. This approach is called control of the "false discovery rate" (FDR) and can be performed in many different ways.
+
+In R some of the more common strategies dealing with the __multiple testing issue__ are included in the `p.adjust` function.
+
+```{r}
+
+## this command will perform multiple testing correction
+pcorr <- p.adjust(ps, method = "fdr")
+
+## this will give a subset of the initial variables which contain less than the 10% of false positives
+which(pcorr < 0.1)
+
+
+
+```
+
+
+
+
 
