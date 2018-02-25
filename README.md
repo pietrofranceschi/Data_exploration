@@ -10,3 +10,6 @@ Material for the practical sessions of the Data Exploration Course
 
 ## Clustering
 [Clustering](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/clustering.md)
+
+## False Discovery Rate
+[FDA](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/FDR.md)
