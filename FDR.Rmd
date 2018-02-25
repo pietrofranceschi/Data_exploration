@@ -1,0 +1,64 @@
+---
+title: "Clustering"
+author: "Pietro Franceschi"
+date: "January 28, 2018"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  fig.path = "figs/fdr"
+)
+```
+
+
+# Multiple testing 
+As we discussed, we call "statistical testing" the framework that allows us to measure the confidence of some hypothesis we are making on the data. As always we would like to be able to derive general conclusions of **scientific** value, but unfortunately we are observing only a subset of the population, and it can be that strange7interesting phenomena happens only by chance.
+
+## Random differences
+Let's consider a comparison of 10 vs 10 samples extracted from the same population
+
+```{r}
+a <- rnorm(10)
+b <- rnorm(10)
+
+## my t-test
+myttest <- t.test(a,b)
+myttest$p.value
+
+```
+
+If I run the previous chunk several times, you will see that the number is changing and, if you are sufficiently patient, evetually you will find what you would identify as a significant difference 
+
+Now, if you are measuring several properties on the same set of samples (protein concentration, metabolite levels, bacterial abundances), you are in substance running "in parallel" a battery of tests, so it is obvious that you could find low p-values only by chance
+
+```{r}
+## 10000 tests (measuring 10000 metabolites)
+
+ps <- rep(0,10000)
+for(i in 1:10000){
+  a <- rnorm(10)
+  b <- rnorm(10)
+  ## my t-test
+  myttest <- t.test(a,b)
+  ps[i] <- myttest$p.value
+
+}
+
+ps[1:30]
+```
+
+and ow let's look to the distribution of p-values
+
+```{r}
+hist(ps, col = "steelblue", main = "p-vals", breaks = 100)
+```
+
+* we have always low p-values
+* we have "true" differences by chance 
+* we cannot conclude that the two groups are different!
+
+
+## Real Dataset
+
