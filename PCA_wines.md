@@ -3,19 +3,24 @@ PCA
 Pietro Franceschi
 January 28, 2018
 
-This demo still deals with PCA. In particular we apply it to the wines dataset.
+This demo still deals with PCA. In particular we apply it to the wines
+dataset.
 
-PCA in R can be performed with many different packages, here we will use two of them which are characterized by an optimal trade off between flexibility and ease to use. The two packages are `FactoMineR` and `factoextra`. An excellent introduction to their use can be found [there](http://www.sthda.com/english/wiki/factoextra-r-package-easy-multivariate-data-analyses-and-elegant-visualization)
+PCA in R can be performed with many different packages, here we will use
+two of them which are characterized by an optimal trade off between
+flexibility and ease to use. The two packages are `FactoMineR` and
+`factoextra`. An excellent introduction to their use can be found
+[there](http://www.sthda.com/english/wiki/factoextra-r-package-easy-multivariate-data-analyses-and-elegant-visualization)
 
-Both packages are not part of the standard R installation. To directly install them just type
+Both packages are not part of the standard R installation. To directly
+install them just type
 
 ``` r
 install.packages("FactoMineR")
 install.packages("Factoextra")
 ```
 
-PCA of Wines Dataset
---------------------
+## PCA of Wines Dataset
 
 First of all we load the data and the two R packages
 
@@ -55,7 +60,8 @@ head(wines)
     ## [5,]    1450
     ## [6,]    1290
 
-Since this `wines` is a matrix, we transform it to a data frame adding also the info about the wine type
+Since this `wines` is a matrix, we transform it to a data frame adding
+also the info about the wine type
 
 ``` r
 winesdf <- cbind.data.frame(class = vintages, wines)
@@ -78,7 +84,8 @@ str(winesdf)
     ##  $ OD ratio         : num  3.4 3.17 3.45 2.93 2.85 3.58 3.58 2.85 3.55 3.17 ...
     ##  $ proline          : num  1050 1185 1480 735 1450 ...
 
-Now we see more clearly the structure of the data, and we can easily use the summary to get some feeling on the situation
+Now we see more clearly the structure of the data, and we can easily use
+the summary to get some feeling on the situation
 
 ``` r
 summary(winesdf)
@@ -113,7 +120,7 @@ summary(winesdf)
     ##  3rd Qu.:3.170   3rd Qu.: 985.0  
     ##  Max.   :4.000   Max.   :1680.0
 
-Let's do some PCA, first of all consider the scaled and unscaled results
+Let’s do some PCA, first of all consider the scaled and unscaled results
 
 ``` r
 winesPCA.scaled <- PCA(winesdf[,2:14],
@@ -125,7 +132,7 @@ fviz_pca_biplot(winesPCA.scaled,
                 repel = TRUE) 
 ```
 
-![](figs/pcawinesunnamed-chunk-5-1.png)
+![](figs/pcawinesunnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 winesPCA <- PCA(winesdf[,2:14],
@@ -138,16 +145,17 @@ fviz_pca_biplot(winesPCA,
                 repel = TRUE) 
 ```
 
-![](figs/pcawinesunnamed-chunk-6-1.png)
+![](figs/pcawinesunnamed-chunk-6-1.png)<!-- -->
 
 Now some questions:
 
--   What can you see about the sample wines?
--   What can you say about the relations (correlation) between the variables?
--   Which are the most discriminating variables?
--   Why the two previous plots are so different?
+  - What can you see about the sample wines?
+  - What can you say about the relations (correlation) between the
+    variables?
+  - Which are the most discriminating variables?
+  - Why the two previous plots are so different?
 
-Let's give a look to the scaled and unscaled raw data ...
+Let’s give a look to the scaled and unscaled raw data …
 
 ``` r
 stripchart(winesdf[,2:14],
@@ -159,9 +167,9 @@ stripchart(winesdf[,2:14],
            cex = 0.3)
 ```
 
-![](figs/pcawinesunnamed-chunk-7-1.png)
+![](figs/pcawinesunnamed-chunk-7-1.png)<!-- -->
 
-And their scale counterpart ...
+And their scale counterpart …
 
 ``` r
 stripchart(as.data.frame(scale(winesdf[,2:14])),
@@ -174,12 +182,11 @@ stripchart(as.data.frame(scale(winesdf[,2:14])),
 abline(h=0)
 ```
 
-![](figs/pcawinesunnamed-chunk-8-1.png)
+![](figs/pcawinesunnamed-chunk-8-1.png)<!-- -->
 
-PCA of the gene expression data
--------------------------------
+## PCA of the gene expression data
 
-To finish this part let's give a fat look to the gene expression data ...
+To finish this part let’s give a fat look to the gene expression data …
 
 ``` r
 ## Load the data
@@ -190,7 +197,8 @@ dim(countsn)
 
     ## [1] 12058    12
 
-So here we have 12 samples and more than 12 thousands variables, and samples are in column. First of all we have to turn the matrix
+So here we have 12 samples and more than 12 thousands variables, and
+samples are in column. First of all we have to turn the matrix
 
 ``` r
 countsn <- t(countsn)
@@ -200,7 +208,7 @@ dim(countsn)
 
     ## [1]    12 12058
 
-Let's give a look to the PCA
+Let’s give a look to the PCA
 
 ``` r
 genesPCA <- PCA(countsn,
@@ -279,20 +287,24 @@ fviz_pca_biplot(genesPCA,
                 label = "none") 
 ```
 
-![](figs/pcawinesunnamed-chunk-12-1.png)
+![](figs/pcawinesunnamed-chunk-12-1.png)<!-- -->
 
-Olalà!
+Olalà\!
 
--   Why this plot?
--   What is telling us?
--   Is something unexpected?
+  - Why this plot?
+  - What is telling us?
+  - Is something unexpected?
 
-Projections
------------
+## Projections
 
-We mentioned that to compare new and old data by PCA the "new" samples should be projected on the old PCA, otherwise the projection plane will be different. This is the most wise way to assess if new samples are compatible with the old ones. Let's see how this can be done on the wines dataset.
+We mentioned that to compare new and old data by PCA the “new” samples
+should be projected on the old PCA, otherwise the projection plane will
+be different. This is the most wise way to assess if new samples are
+compatible with the old ones. Let’s see how this can be done on the
+wines dataset.
 
-To this purpose we project the "Barolo" samples on the PCA costructed on the rest of the dataset
+To this purpose we project the “Barolo” samples on the PCA costructed on
+the rest of the dataset
 
 ``` r
 proj.winesPCA <-PCA(winesdf[,2:14],
@@ -305,6 +317,11 @@ fviz_pca_biplot(proj.winesPCA,
                 repel = TRUE) 
 ```
 
-![](figs/pcawinesunnamed-chunk-13-1.png)
+![](figs/pcawinesunnamed-chunk-13-1.png)<!-- -->
 
-The new individuals are in blue, as you can see the picture is now different compared to the one obtained with the full PCA. What we can say, now, is that Barolo samples are more similar to Grignolino than Barbera, but remember that this is true only because we look to a projection that is different from the old one. The data, indeed, always occupy the same position in the 14 dimensional space of the variables
+The new individuals are in blue, as you can see the picture is now
+different compared to the one obtained with the full PCA. What we can
+say, now, is that Barolo samples are more similar to Grignolino than
+Barbera, but remember that this is true only because we look to a
+projection that is different from the old one. The data, indeed, always
+occupy the same position in the 14 dimensional space of the variables

@@ -19,8 +19,8 @@ PCA in R can be performed with many different packages, here we will use two of 
 
 Both packages are not part of the standard R installation. To directly install them just type
 ```{r eval=FALSE}
-install.packages("FactoMineR")
-install.packages("Factoextra")
+#install.packages("FactoMineR")
+#install.packages("Factoextra")
 ```
 
 
@@ -32,6 +32,7 @@ library(FactoMineR)
 library(factoextra)
 data(iris)
 head(iris)
+dim(iris)
 ```
 
 

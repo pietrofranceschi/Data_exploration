@@ -65,35 +65,37 @@ dim(as.matrix(toy.dist))
 
 
 ```{r, echo=TRUE}
-heatmap(as.matrix(toy.dist))
+library(factoextra)
+fviz_dist(toy.dist)
 ```
 
 We have clearly two groups, but this is what we expect
 
-```{r, echo=TRUE}
-heatmap(as.matrix(dist(toydata, method = "manhattan")))
-```
-
-The heatmap is not changing  radically, but it is not the same and this demonstrate the importance of a principled choice of the distance (dissimilarity) measure.
 
 Agglomerative clustering in R can be performed without additional packages, the results is a dendrogram
 
 
 ```{r}
 toy.complete <- hclust(toy.dist)
+
 ## plot it
-plot(toy.complete, labels = classes)
-abline(h = 4, col = "red")
+fviz_dend(toy.complete,
+          cex = 0.5,       ## size of the text
+          k = 2,
+          rect = TRUE)
 ```
 
-The red horizontal line represent an arbitrary cut, the labels are the classes. As expected, in this easy example, the dendrogram shows two clear groups, which coincide with the initial classes
+As expected, in this easy example, the dendrogram shows two clear groups, which coincide with the initial classes
 
 This is the effect of a change in linkage
 
 ```{r, echo = TRUE}
 toy.single <- hclust(toy.dist, method = "single")
 ## plot it
-plot(toy.single, labels = classes)
+fviz_dend(toy.single,
+          cex = 0.5,       ## size of the text
+          k = 2,
+          rect = TRUE)
 ```
 
 Also in this case the two groups structure is clear, but, another time, remember that this is a really easy case.
@@ -107,10 +109,19 @@ mycut <- cutree(toy.complete, h = 8)
 
 ## to get a visual feedback ... 
 table(mycut,classes)
+```
 
+
+As discussed in the lecture, if he dendrogram gives a good representation of the distribution of the points in the space, the cophenetic distance (the on ecalculated on the dendrogram) should be highly correlated with the "overall" distance 
+
+```{r}
+res.coph <- cophenetic(toy.complete)
+
+cor(toy.dist, res.coph)
 
 ```
 
+Which here is indeed the case.
 
 ## The Iris dataset
 
@@ -125,30 +136,30 @@ now we look to the dendrogram obtained by HC
 ```{r}
 iris.complete <- hclust(dist(iris[,1:4]))
 ## plot it
-plot(iris.complete, hang = -1, cex = 0.3, labels = iris$Species)
+fviz_dend(iris.complete,
+          cex = 0.5,       ## size of the text
+          k = 2,
+          rect = TRUE)
 ```
 
 
-This is clearly not the optimal visualization ... if you want prettier plot please look there [there](http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning#plot.dendrogram-function). Beyond aesthetics, we already see that here the situation is less clear than before. How many groups?
+Beyond aesthetics, we already see that here the situation is less clear than before. How many groups?
 In addition the scaling of the variables could also make a difference ... 
 
 ```{r}
 iris.complete.s <- hclust(dist(scale(iris[,1:4])))
 ## plot it
-plot(iris.complete.s, hang = -1, cex = 0.3, labels = iris$Species)
+fviz_dend(iris.complete.s,
+          cex = 0.5,       ## size of the text
+          k = 2,
+          rect = TRUE)
 ```
 
 Is this what you expect? 
-
-
-Just to show you, let's make some beautification.
-
+In this case we do know the "label" of the different samples so we can visualiza them quite easily ...
 
 ```{r}
-library(factoextra)
-
 iris.complete.s$labels <- as.character(iris$Species)
-
 
 fviz_dend(iris.complete.s,
           cex = 0.5,       ## size of the text
@@ -161,20 +172,9 @@ fviz_dend(iris.complete.s,
 ```
 
 
-
-
-
-**DIY HC assignments**
-
-- Get the `wines.RData` and cluster the wines.
-- Look how the picture is changing if you tweak the linkage (argument method)
-- look how the picture is changing if you change the scaling of the data.
-- ADVANCED: try to visualize the clusters in the PCA plane ;-)  
-
-
 ## Partitional Clustering
 
-In the case of partitional clustering we will follow the same path. Starting from the toy data, down to the iris data. To visualize some of the results, the `facroextra` can be also used.
+In the case of partitional clustering we will follow the same path. Starting from the toy data, down to the iris data. To visualize some of the results, the `facroextra` package can be also used.
 
 
 ## The Toy dataset
@@ -206,24 +206,6 @@ As you can see a third cluster is identified ... but this is not unexpected sinc
 * ... if I run it several times I'll not always get the same answer ...
 * Do you really have groups? Think, another time, to the "course of dimensionality"
 
-To find the best number of groups a reasonable idea would be to calculate the within group sum of squares. If the number of clusters is optimal this should give a good representation of the samples, so this sum should be minimal.
-
-
-```{r}
-wSS <- rep(0,9)
-for (i in 1:9){
-  pippo  <- kmeans(toydata, centers = i, nstart = 100)
-  wSS[i]  <- pippo$tot.withinss
-}
-
-plot(seq(1,9), wSS, type = "b")
-```
-
-
-* The `nstart` argument used before is a way to find the "best" solution for a given number of clusters (we know that different starting points can give different results also for the same number of clusters)
-* The wSS drops from one to two and then it stays almost constant ... this is a good indication of the presence of two clusters, but remember that here we have only two variables ...
-
-
 ## The Iris dataset
 
 ```{r}
@@ -244,7 +226,13 @@ km.res <- kmeans(iris.scaled, 3, nstart = 50)
 
 # Visualize kmeans clustering
 # use repel = TRUE to avoid overplotting
-fviz_cluster(km.res, iris[, -5], palette = "Set2", ggtheme = theme_minimal())
+fviz_cluster(km.res, iris[, -5], palette = "Set2",
+            ellipse.type = "euclid", # Concentration ellipse
+             star.plot = TRUE, # Add segments from centroids to items
+             repel = TRUE # Avoid label overplotting (slow)
+            ) + 
+  theme_minimal() + 
+  theme(aspect.ratio = 1)
 ```
 
 This is nice, but better would be to have the initial labels ... in textual form this can be seen like this
@@ -255,25 +243,125 @@ table(iris$Species,km.res$cluster)
 ```
 
 
-We know how a clusters plot should behave in terms of sum of squares ...
+# Assessing cluster tendency and finding the number of clusters ...
 
 ```{r}
+library(cluster)
+library(fpc)
+library(NbClust)
+library(clustertend)
+```
 
+## Visual methods
+Basically here the idea is to inspect the distance matrix looking for structures ...
+
+
+```{r}
+df <- iris[, -5]
+# Random data generated from the iris data set
+random_df <- apply(df, 2,
+function(x){runif(length(x), min(x), (max(x)))})
+random_df <- as.data.frame(random_df)
+# Standardize the data sets
+df <- iris.scaled <- scale(df)
+random_df <- scale(random_df)
+```
+
+And then plot the distance matrices ...
+
+```{r}
+fviz_dist(dist(as.matrix(df)))
+```
+
+```{r}
+fviz_dist(dist(as.matrix(random_df)))
+```
+
+
+## Hopkins Statistics
+Hopkins statistics can be calculated with a function provided in the __clustertend__ package ...
+
+```{r}
+hopkins(df, n=nrow(df)-1)
+```
+
+```{r}
+hopkins(random_df, n=nrow(random_df)-1)
+```
+
+A value near 0.5 suggests that the distribution of the data is not different from a random one.
+
+
+## Sum of Squares
+To find the best number of groups a reasonable idea is to calculate the within group sum of squares. If the number of clusters is optimal this should give a good representation of the samples, so this sum should be minimal.
+
+
+```{r}
 wSS <- rep(0,9)
 for (i in 1:9){
-  pippo  <- kmeans(iris.scaled, centers = i, nstart = 100)
+  pippo  <- kmeans(toydata, centers = i, nstart = 100)
   wSS[i]  <- pippo$tot.withinss
 }
 
 plot(seq(1,9), wSS, type = "b")
 ```
 
-As you see here the plot is less informative. It is not easy to decide how many clusters we see. two seems to be the best choice, as the previous plot indicates.
+
+* The `nstart` argument used before is a way to find the "best" solution for a given number of clusters (we know that different starting points can give different results also for the same number of clusters)
+* The wSS drops from one to two and then it stays almost constant ... this is a good indication of the presence of two clusters, but remember that here we have only two variables ...
+
+In the case of he iris data ...
+
+```{r}
+fviz_nbclust(df, kmeans, method = "wss") +
+geom_vline(xintercept = 3, linetype = 2)
+```
+
+
+
+As you see here the plot is less informative. It is less easy to decide how many clusters we see. Three seems to be the best choice, as also our previous analysis was indicating. 
+
+## Silhouette
+K menas clustering on the iris dataset ...
+
+```{r}
+km.res <- eclust(df, "kmeans", k = 2, nstart = 25, graph = FALSE)
+```
+
+Silhoutte
+
+```{r}
+fviz_silhouette(km.res, palette = "jco") + theme_minimal()
+```
+
+## Dunn Index
+
+When I cluster the iris data ... to see what happens try with two and three clusters ...
+
+```{r}
+# Statistics for k-means clustering on iris data
+km_stats <- cluster.stats(dist(df), km.res$cluster)
+# Dunn index
+km_stats$dunn
+
+```
+
+when I cluster the random data ...
+
+```{r}
+
+km.res2 <- eclust(random_df, "kmeans", k = 2, nstart = 25, graph = FALSE)
+# Statistics for k-means clustering on iris data
+km_stats_rnd <- cluster.stats(dist(random_df), km.res2$cluster)
+# Dunn index
+km_stats_rnd$dunn
+
+```
 
 
 ## DIY  assignments
 
-- Get the `wines.RData` and cluster the wines.
+- Get the `wines.RData` and cluster the wines (HC and k-means)
 - Try to find the "optimal" number of groups by looking to the wSS
 - look how the picture is changing if you change the scaling of the data.
 - ADVANCED: try to visualize the clusters in the PCA plane. To do that you have to "manually" construct your plot ;-)

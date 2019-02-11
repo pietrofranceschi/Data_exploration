@@ -160,7 +160,7 @@ As you see the data distribution does not really agree with a normal one. But re
 qqplots are better that histograms to compare distributions (they can be used also to compare the data against other theoretical distributions or against other data)
 
 ```{r}
-hist(iris$Sepal.Length, col = "red", breaks = 20)
+hist(iris$Sepal.Length, col = "red", breaks = 30)
 ```
 
 The histogram suggests that the distribution has a shoulder on the right, but from this plot it is hard to draw conclusions on the distributions.
@@ -251,4 +251,31 @@ Play around and visualize rnaseq and the wine dataset!
 
 
 
+```{r}
+library(tidyverse)
 
+winedf <- data.frame(wines, vintages)
+
+winedf %>% ggplot() +
+  geom_jitter(aes(x = vintages, y = proline, col = vintages), width = 0.1) + theme_light()
+```
+
+
+```{r fig.height=15, fig.width=10}
+winedf %>% 
+  gather(compound, I, -vintages) %>% 
+  ggplot() +
+  geom_jitter(aes(x = vintages, y = I, col = vintages), 
+              width = 0.1) + 
+  facet_wrap(~compound, scales = "free", ncol = 2) + 
+  theme_light()
+  
+```
+
+```{r}
+summary(wines)
+```
+```{r}
+qqnorm(winedf$proline, col = winedf$vintages)  
+qqline(winedf$proline)
+```
