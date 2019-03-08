@@ -20,8 +20,8 @@ As we discussed, we call "statistical testing" the framework that allows us to m
 Let's consider a comparison of 10 vs 10 samples extracted from the same population
 
 ```{r}
-a <- rnorm(10)
-b <- rnorm(10)
+a <- rnorm(3)
+b <- rnorm(3)
 
 ## my t-test
 myttest <- t.test(a,b)
