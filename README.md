@@ -1,4 +1,4 @@
-# CIBIO_Phd_course_2018
+# Data Explration Course
 Material for the practical sessions of the Data Exploration Course 
 
 ## False Positives

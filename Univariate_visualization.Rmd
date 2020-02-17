@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(
   fig.path = "figs/univariate"
 )
+library(knitr)
 ```
 
 
@@ -34,12 +35,12 @@ Some of the dataset are distributed as part of R packages, others have to be exp
 
 ```{r}
 ## load the data provided by R itself
-data("iris")
+data("data/iris")
 
 ## load the data from the disk (remember to set the correct working directory)
-load("NIR.RData")
-load("rnaseq.RData")
-load("wines.RData")
+load("data/NIR.RData")
+load("data/rnaseq.RData")
+load("data/wines.RData")
 
 ```
 
