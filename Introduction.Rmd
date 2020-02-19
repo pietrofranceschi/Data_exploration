@@ -1,0 +1,537 @@
+---
+title: "Data Exploration - Introduction"
+author: "Pietro Franceschi"
+date: "11/02/2020"
+institute: "FEM - UBC"
+
+output: 
+  beamer_presentation:
+    theme: "Warsaw"
+    colortheme: "orchid"
+    incremental: false
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(knitr)
+library(tidyverse)
+```
+
+
+
+# Introduction
+
+## Why
+
+\begin{center}
+\color{red}{Because nowadays almost all biological/natural systems are characterized in high throughput omics experiments} 
+\end{center}
+
+\vspace{1em}
+
+### Biosystem Data Analysis
+Develop and validate methods for organizing, summarizing and visualizing complex biological data through the integration of bioinformatics and biostatistics
+
+## Always more data
+
+* Genomics
+* Metabolomics
+* Proteomics
+
+* High throughput phenotyping
+* Distributed network of sensors
+
+## Qualitative and quantitative
+
+
+Technological advancement  (experimental techniques, IT) is transforming the “soft sciences” in  quantitative disciplines 
+
+\vspace{1em}
+
+```{r, echo=FALSE, fig.align='center', out.width="60%"}
+include_graphics("images/quali_quan.png")
+```
+
+## Data, knowledge, data analysis
+
+bioinformatics, statistics, chemometrics, provide the tools to
+
+* Promote the incremental progress of science
+* Guarantee the validity and the correctness of the results
+* Facilitate the production of “scientific” results (of general validity ...)
+* Be consistent
+* Get the maximum from complex data
+
+## Why we need statistics ...
+
+```{r, echo=FALSE, fig.align='center', out.width="70%"}
+include_graphics("images/tree.png")
+```
+
+
+## Some Ideas
+
+* The leaf always fall
+* It is not at all easy to say where
+* If it would be an apple the prediction would be easier
+* Every leaf is different ... so measuring once is not sufficient 
+* I will end up with a probability
+* The distribution can be **very** narrow
+
+## Variability
+
+* What we observe is the result of a "chain" of processes (e.g. gene -> protein -> metabolite)
+* We never observe only one chain (e.g we consider *many* people with similar metabolism)
+* The fact that we have noise on the "chain" produces variability in the output
+* This variability has a bell shaped profile, which is more often than not **Gaussian** 
+
+## Coin toss
+
+The distribution of the outcomes of 50 tosses of the same coin
+
+
+```{r, out.width="50%", fig.align='center'}
+sample.space <- c(0,1)
+
+flips <- sample(sample.space, 
+                size = 50, 
+                replace = TRUE, 
+                prob = c(0.5, 0.5))
+
+hist(flips, col = "steelblue", main = "50 flips")
+
+```
+
+This "biological" process is clearly non normally distributed, but has variability
+
+## Sum of 50 coin tosses
+
+Suppose that now my "biological" process is the result of the sum of 50 coin tosses ...
+
+```{r, out.width="50%", fig.align='center'}
+sample.space <- c(0,1)
+
+sums <- rep(0,50)
+
+for(i in 1:50){
+  sums[i] <- sum(sample(sample.space, 
+                size = 50, 
+                replace = TRUE, 
+                prob = c(0.5, 0.5)))
+}
+
+
+
+hist(sums, col = "steelblue", main = "50 flips")
+
+```
+
+Here the "biological" process yields normally distributed data!
+
+## The empirical low of chance
+
+### The Law
+In a sequence of experiments performed on the same conditions the relative frequency of a phenomenon gets closer to the probability of the phenomenon itself ... and the goodness of this approximation improves as the number of experiments increases.
+
+## Data Deluge
+
+```{r, echo=FALSE, fig.align='center', out.width="70%"}
+include_graphics("images/datadeluge.jpg")
+```
+
+\begin{center}
+\color{red}{Measuring more does not necessarily mean understanding more}
+\end{center}
+
+\vspace{2em}
+
+\tiny
+**Nate Silver**: *The Signal and the Noise: Why So Many Predictions Fail, but Some Don't* 
+
+## Data Analysis in a Nutshell
+
+Highlight the presence of **organization** inside complex datasets, trying to measure with which ***confidence*** one can say that this organization is true at the population level
+
+Is what I’m observing ***true beyond my sample***?
+
+```{r fig.align='center', fig.width=8, fig.height=5, out.width="50%"}
+load("data/wines.RData")
+
+par(mfrow = c(1,2))
+plot(wines[,"tot. phenols"],wines[,"flavonoids"], 
+     xlab = "phenols", ylab = "flavonoids", pch = 19, cex= 1, col = "#c62d4260")
+boxplot(wines[,"alcohol"]~vintages, ylab = "alcohol", xlab = "", col = "#353B8360")
+
+
+
+```
+
+## No organization ...
+
+```{r fig.align='center', fig.width=8, fig.height=5, out.width="80%"}
+
+par(mfrow = c(1,2))
+plot(rnorm(100),rnorm(100), 
+     xlab = "Var 1", ylab = "Var 2", pch = 19, cex= 1, col = "#c62d4260")
+boxplot(rnorm(100)~rep(c("A","B"), each = 50), ylab = "class", xlab = "", col = "#353B8360")
+
+```
+
+
+
+
+## Data Matrix
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/datamatrix.png")
+```
+
+## For the audience
+
+* What are the preprocessing steps if you have to analyze a gene expression experiment?
+* What are the variables in a targeted metabolomics experiment?
+* What are the variables in a next generation sequencing experiment?
+* What are the variables in a metagenomic investigation?
+
+## Multivariate vs Univariate
+
+* **Univariate Approach**: each experimental variable is analyzed/visualized autonomously
+* **Multivariate Approach**: Each sample (observation) is a point in the *n* dimensional space of the variables. E.g If we measure three properties the space is three dimensional.
+
+## Why multivariate ...
+
+```{r, echo=FALSE, fig.align='center', out.width="80%"}
+include_graphics("images/multivariate.png")
+```
+
+
+
+## How Big is the space ?
+
+* Untargeted metabolomics ~ 1000/10000 variables/dimensions
+* Targeted  proteomics ~ 1000/3000 variables/dimensions
+* Targeted metabolomics ~ 100/200 variables/dim
+* NGS, Metagenomics ...
+
+### How many samples
+Most experiments are performed on 10-100 samples. This is the number of points in the multidimensional space
+
+## The course of dimensionality
+
+```{r, echo=FALSE, fig.align='center', out.width="60%"}
+include_graphics("images/course_dim.png")
+```
+
+## Variable Dependence
+
+Since the variable we measure are **not independent** (e.g. network of genes, associated proteins, ecc ...). 
+
+The effective size of the space occupied by the samples is smaller than the number of variables. 
+
+This is equivalent to say that the cloud of samples can only populate a limited part of the available multivariate space
+
+## 
+
+```{r, echo=FALSE, fig.align='center', out.width="80%"}
+include_graphics("images/Strong--weak--no-correlation.png")
+```
+
+In presence of dependence between the variables (**1** and **2**), the samples are occupying a smaller part of the available space.
+
+## Type of variable dependence
+
+* "Analytical"/chemical
+* Biological
+* ...
+
+\vspace{3em}
+
+> Let's look for the source of dependence in your research areas ...
+
+## 
+
+\Large
+\begin{center}
+\color{red}{Dependence has the following positive implications}
+\end{center}
+
+\normalsize
+\vspace{2em}
+
+* multivariate approaches are potentially more “effective” since they use explicitly variable correlation
+* we can make reasonably **good science** even from experiments with **relatively small number of samples** 
+
+##
+
+```{r, echo=FALSE, fig.align='center', out.width="50%"}
+include_graphics("images/important.png")
+```
+
+* With small number of samples we'll always find **spurious organization**.
+* This will always lead to \color{red}{FALSE DISCOVERIES}
+
+##
+
+```{r, echo=FALSE, fig.align='center', out.width="90%"}
+include_graphics("images/live.jpg")
+```
+
+## False Discoveries
+
+```{r, echo=FALSE, fig.align='center', out.width="50%"}
+include_graphics("images/important.png")
+```
+
+\vspace{1em}
+
+### False Discovery
+*  any for of organization which is visible in my dataset, but cannot be generalized at the population level.
+* is **not an error**, but is an inherent result of chance during **sampling** ... we can see it a sort of "bad luck".
+
+# Interlude:  Correlation and Causation
+
+## Correlation
+
+```{r, echo=FALSE, fig.align='center', out.width="80%"}
+include_graphics("images/correlation.png")
+```
+
+* Correlation (Pearson), measures the noisiness and direction of a linear relationship, but not the slope of that relationship.
+* Two variables linked by causal relation are correlated
+* The reverse is not true ...
+
+##
+
+\Large
+[Spurious correlations ... ;-P ](https://tylervigen.com/spurious-correlations)
+
+##
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/newengland.png")
+```
+
+
+# Data visualization
+
+## Data Visualization
+
+\Large
+\begin{center}
+\color{red}{Choosing the right way to visually inspect the data allows to ....}
+\end{center}
+
+\normalsize
+\vspace{2em}
+
+* Check if my experiment is running smoothly
+* Identify sub-populations or outliers
+* Check Distribution of data
+* Assess the need of variable scaling and sample normalization
+* Manage missing values
+* Publish in a better journal ;-)
+
+## Running Experiment
+
+```{r, echo=FALSE, fig.align='center', out.width="60%"}
+include_graphics("images/PCAtrend.png")
+```
+
+## Outliers!
+
+```{r, echo=FALSE, fig.align='center', out.width="60%"}
+include_graphics("images/PCAoutlier.png")
+```
+
+## Dealing With outliers
+
+```{r, echo=FALSE, fig.align='center', out.width="50%"}
+include_graphics("images/important.png")
+```
+
+* It is unfair to exclude samples which are not in keeping with our theory/hope
+* Sometimes outliers are indicators of unexpected and relevant science
+* Samples can be excluded if there are **indisputable** evidence that they were "bad" (e.g. analytical errors)
+* The best is to keep them in and rely on **robust** data analysis methods (e.g robust PCA)
+
+## Interlude: Boxplots
+
+```{r, echo=FALSE, fig.align='center', out.width="70%"}
+include_graphics("images/boxplot.png")
+```
+
+Boxplots nicely summarize the properties of a population, but I need to have a population ! 
+
+## Red and yellow berries
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/rubusbox.png")
+```
+
+## Rubus subpopulations
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/rubusstrip.png")
+```
+
+
+## Take home messages
+
+```{r, echo=FALSE, fig.align='center', out.width="50%"}
+include_graphics("images/important.png")
+```
+
+* Use boxplots wisely
+* Plot the raw data points!
+* Think in advance making a well planned experimental design
+
+## Data Distribution
+
+* We measure more than one sample (hopefully)
+* **Variability** will make the sample slightly different
+* Each property we measure will show some sort of "distribution"
+* We assume that the distribution we measure on the sample is related to the distribution of the property in the population
+
+## Mean - Median 
+
+```{r, echo=FALSE, fig.align='center', out.width="40%"}
+include_graphics("images/meanmedmedian.png")
+```
+
+## Mean and median 
+
+\scriptsize
+```{r, echo = TRUE}
+## my measuremnts
+x <- c(1,2,3,4,5)
+mean(x)
+median(x)
+```
+
+```{r, echo = TRUE}
+## my measuremnts with one outlier
+y <- c(1,2,3,4,50)
+mean(y)
+median(y)
+```
+
+## On the mean: normal data
+
+```{r}
+a <- rnorm(1000)
+
+hist(a, breaks = 50, col = "steelblue", main = "Normal data")
+abline(v = mean(a), col = "red", lty = 2, lwd = 2)
+```
+## On the mean: non-normal data
+
+```{r}
+b <- rlnorm(1000, meanlog = 0, sdlog = 1)
+
+hist(b, breaks = 50, col = "steelblue", main = "Lognormal data")
+abline(v = mean(b), col = "red", lty = 2, lwd = 2)
+```
+
+## Take home messages
+
+```{r, echo=FALSE, fig.align='center', out.width="50%"}
+include_graphics("images/important.png")
+```
+
+* With normally distributed data the mean is the most probable value
+* Normality is a prerequisite for many statistical tools 
+* Statistics like the mean
+* ... but the mean is not robust
+* ... and many variable we measure are not normally distributed (e.g. counts)
+
+## Checking normality
+
+* **statistical tests**: in general unreliable with the typical number of samples we are dealing with
+* **quantile-quantile plots**: these graphical tools are really handy to evaluate the distribution of my data. Remember that I need anyway a reasonable amount of samples: 3,5,10 are not sufficient!
+
+## QQ plots 
+
+```{r fig.align='center', fig.width=8, fig.height=5, out.width="80%"}
+
+par(mfrow = c(1,2))
+qqnorm(a, main = "Normal Data", pch = 19, cex= 1, col = "#c62d4260")
+qqline(a)
+
+qqnorm(b, main = "Lognormal Data", pch = 19, cex= 1, col = "#c62d4260")
+qqline(b)
+
+
+```
+
+## Data Transformations
+
+### Promoting Normality
+Non normally distributed data can be transformed into almost normal data prior to statistical analysis in order to avoid biased results.
+
+* `log` transformation for counts or concentrations
+* `arcsin` transformation for percentages
+* Box-Cox transformation
+* ...
+
+## Variable Scaling
+
+\scriptsize
+More often than not, the set of variables measured on the samples are highly variable in magnitude. High intensity variables will then determine the shape of the sample cloud in the multidimensional space.
+
+**Scaling** is the process used to compensate for that
+
+```{r fig.align='center', fig.width=7, out.width="50%"}
+load("data/wines.RData")
+par(mar=c(3,10,1,1))
+boxplot(wines, col = "orange", horizontal = TRUE, las = 2)
+```
+
+
+## Autoscaling
+
+\scriptsize
+This is an exceptionally common preprocessing method which uses mean-centering followed by division of each column (variable) by the standard deviation of that column.
+
+```{r fig.align='center', fig.width=7, out.width="50%"}
+load("data/wines.RData")
+par(mar=c(3,10,1,1))
+boxplot(scale(wines), col = "orange", horizontal = TRUE, las = 2)
+```
+
+## Scaling Alternatives 
+
+* `log`: compresses high intensity values, but has problems with zeroes
+* `sqrt`: here the compression is less severe, but zeroes are allowed
+* Do you see issues with autoscaling?
+
+## Normalization
+
+With **normalization** we indicate the process of transforming the intensities of the signal measured in each sample in order to make the samples directly comparable. 
+
+* dilution of the sample (e.g. urine)
+* different biomass (e.g number of cells)
+* amount of DNA in amplification
+* ...
+
+## Methods
+
+* Matrix specific strategies (e.g. creatinine in urine)
+* Housekeeping genes
+* Internal standards (proteomics or metabolomics)
+* Relative intensities (metagenomics)
+* Probabilistic Quotient Noralization
+
+## Compositional Data
+
+```{r, echo=FALSE, fig.align='center', out.width="80%"}
+include_graphics("images/compositional.png")
+```
+
+Normalization has created a new biomarker!
+
+##
+
+```{r, echo=FALSE, fig.align='center', out.width="90%"}
+include_graphics("images/live.jpg")
+```
