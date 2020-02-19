@@ -424,7 +424,8 @@ a <- rnorm(1000)
 hist(a, breaks = 50, col = "steelblue", main = "Normal data")
 abline(v = mean(a), col = "red", lty = 2, lwd = 2)
 ```
-## On the mean: non-normal data
+
+  ## On the mean: non-normal data
 
 ```{r}
 b <- rlnorm(1000, meanlog = 0, sdlog = 1)
