@@ -2,7 +2,7 @@
 title: "False Positives"
 author: "Pietro Franceschi"
 date: "4 February 2019"
-output: rmarkdown::github_document
+output: html_document
 ---
 
 
