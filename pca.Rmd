@@ -1,0 +1,459 @@
+---
+title: "Data Exploration - PCA"
+author: |
+  | Pietro Franceschi 
+  | pietro.franceschi@fmach.it
+institute: "FEM - UBC"
+
+output: 
+  beamer_presentation:
+    theme: "Warsaw"
+    colortheme: "orchid"
+    incremental: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(knitr)
+```
+
+## Variability and distributions
+
+```{r out.width="70%", fig.align='center'}
+hist(rnorm(300), breaks = 40, xlim = c(-5,5), freq = FALSE, col = "steelblue", main = "300 draws from normal distribution")
+curve(dnorm, add = TRUE, col = "darkred", lwd = 2)
+
+
+```
+
+###
+* Variability generates distributions
+* Distribution is linked to probability
+* Empirical distribution can be used to estimate "general" probability
+
+
+
+## Normal Distribution
+
+```{r out.width="70%", fig.align='center'}
+curve(dnorm, col = "steelblue", xlim = c(-3,3), lwd = 3)
+
+```
+
+### Being Normal
+* has a central role in statistics
+* is often a prerequisite
+* is often an exception (e.g. subpopulations in my data)
+
+## Normal Distribution
+
+```{r out.width="70%", fig.align='center'}
+curve(dnorm, col = "steelblue", xlim = c(-3,3), lwd = 3)
+
+```
+
+### Being Normal
+* mean and median are the same
+* the mean is the most probable value
+* it makes sense to focus on the mean
+* we restore normality by transforming the data
+
+
+## Conservation of misery
+
+::: {.block}
+### The data analyst dilemma
+\Large
+\color{red}{Data + Knowledge = Constant}
+:::
+\normalsize
+
+* parametric vs non parametric tests
+* variable association from knowledge or data
+* ...
+
+## Multivariate data - the Data Matrix
+
+```{r fig.height=5, fig.width=5, out.width="60%", fig.align='center'}
+par(pty="s")
+plot(1:10,1:10, type = "n", xaxt='n', ann=FALSE, yaxt='n')
+mtext("Variables", side=3)
+mtext("Samples", side=2)
+arrows(3,1,3,4.5, length = 0.1, lwd = 2, col = "darkred")
+arrows(3,10,3,5.5, length = 0.1, lwd = 2, col = "darkred")
+arrows(1,5,2.5,5, length = 0.1, lwd = 2, col = "darkred")
+arrows(10,5,3.5,5, length = 0.1, lwd = 2, col = "darkred")
+text(3,5, cex = 1.5, expression(X[ij]))
+
+```
+
+* The element $X_{ij}$ contains the value of variable `j` in the sample `i`
+
+
+## Centering and Scaling
+
+```{r fig.height=4, fig.width=6}
+
+library(MASS)
+# Simulate bivariate normal data
+mu <- c(5,6)                         # Mean
+Sigma <- matrix(c(2,2, 2, 5), 2)  # Covariance matrix
+# > Sigma
+# [,1] [,2]
+# [1,]  1.0  0.1
+# [2,]  0.1  1.0
+ 
+# Generate sample from N(mu, Sigma)
+bivn <- mvrnorm(100, mu = mu, Sigma = Sigma )  # from Mass package
+par(pty="s", mfrow = c(1,3))
+plot(bivn, pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-10,10), ylim = c(-10,10), main = "Raw")
+abline(v=0, lty = 2)
+abline(h=0, lty = 2)
+plot(scale(bivn, scale = FALSE), pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-10,10), ylim = c(-10,10), main = "Centered")
+abline(v=0, lty = 2)
+abline(h=0, lty = 2)
+plot(scale(bivn), pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-5,5), ylim = c(-5,5), main = "Centered and Scaled")
+abline(v=0, lty = 2)
+abline(h=0, lty = 2)
+
+
+```
+
+
+## Dimensionality
+
+::: {.block}
+### Intrinsic Dimensionality
+In presence of correlation among the variables, the samples
+actually occupy only a "fraction" of the potential
+multidimensional space
+:::
+
+
+\vspace{2em}
+
+```{r fig.width=8, fig.height=4, out.width="100%", fig.align='center'}
+library(plot3D)
+par(mfrow = c(1,3))
+scatter3D(runif(50), runif(50), runif(50), colvar = NULL, col = "#4682B480", pch = 19, main = "Intrinsic dim = 3", cex = 2)
+t <- seq(1,10,0.3)
+xl <- t+rnorm(length(t), sd = 0.3)
+yl <- t+rnorm(length(t), sd = 0.3)
+zl <- t+rnorm(length(t), sd = 0.3)
+scatter3D(xl, yl, zl, colvar = NULL, col = "#4682B480", pch = 19, main = "Intrinsic dim = 1", 
+          xlim = c(-3,10), ylim = c(-3,10), theta = 5, phi = 20, cex = 2)
+
+xp <- runif(50,0,10)
+yp <- runif(50,0,10)
+zp <- -xp-yp+1 + rnorm(length(xp), sd = 0.1)
+scatter3D(xp, yp, zp, colvar = NULL, col = "#4682B480", pch = 19, main = "Intrinsic dim = 2", theta = 50, cex = 2, phi = 30)
+
+```
+
+
+## Latent Variable
+
+
+::: {.block}
+### Latent Variable
+(Mathematical) combination of several variables. Looking to the data along **specific latent variables**, we highlight some desired property of
+the dataset
+:::
+
+* Separation of sample classes (e.g. LDA)
+* Prediction of sample properties (e.g. PLS)
+* Good representation of the multidimensional data structure (e.g PCA, PCoA)
+
+## Loadings and Scores
+ 
+### LVs and Projections
+A set of latent variable can be used to reconstruct an informative representation of the dataset which captures some
+relevant multidimensional aspects of the data.
+This representation is constructed "projecting" the samples on the LVs
+
+### Loading and Scores
+* **Scores**: the representation of the samples in the LV space
+* **Loadings**: the "weight" of the original variables on the single LVs
+
+## Dummy Dataset
+
+```{r fig.height=5, fig.width=5, out.width="60%", fig.align='center'}
+par(pty="s")
+mu1 <- c(-1,0)
+mu2 <- c(1,0)
+sigma <- matrix(c(0.1,0, 0, 2), 2)  # Covariance matrix
+dummy <- rbind(mvrnorm(20, mu = mu1, Sigma = sigma),
+              mvrnorm(20, mu = mu2, Sigma = sigma))
+
+
+plot(dummy, pch = 19, col = rep(c("#4682B480","#8B000080"), each  =20), xlab = "Var a", ylab = "Var b", xlim = c(-3,3), ylim = c(-3,3))
+```
+
+> What LV will separate the two groups?
+
+
+## LV for class discrimination
+
+```{r fig.height=5, fig.width=5, out.width="60%", fig.align='center'}
+par(pty="s")
+grouping <- rep(c(1,2), each = 20)
+myLDA <- lda(x = dummy, grouping = grouping)
+s <- seq(-10,10,0.5)
+ldadirection <- myLDA$scaling[,1]/sqrt(sum(myLDA$scaling[,1]^2))
+
+
+projections <-ldadirection %*% t(dummy)
+
+
+
+plot(dummy, pch = 19, col = rep(c("#4682B480","#8B000080"), each  =20), 
+     xlab = "Var a", ylab = "Var b", 
+     xlim = c(-3,3), ylim = c(-3,3))
+lines(s*myLDA$scaling[1,1], s*myLDA$scaling[2,1], col = "red", lwd = 2)
+points(projections*ldadirection[1], projections*ldadirection[2], col = rep(c("#4682B4","#8B0000"), each = 20), pch = 4, cex = 2)
+
+```
+
+\footnotesize
+* The red line represents the direction of maximal separation between the two classes
+* The crosses are the **scores** along this direction 
+
+## Loadings for class discrimination
+
+The loadings represent the weight of the initial variables along the discriminating direction
+
+* `Var a`: `r ldadirection[1]`
+* `Var b`: `r ldadirection[2]`
+
+## Principal Component Analysis (PCA) 
+
+The aim of PCA is dimension reduction and PCA is the most frequently applied method for computing linear latent variables
+(components). 
+
+\vspace{1em}
+
+### PCA
+The transformation is defined in such a way way that the first principal component has the **largest possible variance** (that is, accounts for as much of the variability in the data as possible), and each succeeding component in turn has the highest variance possible under the constraint that it is **orthogonal** to the preceding components.
+* In PCA the “objective” of the projection is to maximize variance
+* PCA “view” will enhance the spread of the data
+* The key idea is that **variability means information** 
+
+
+
+## Animation!
+
+\Large
+
+[PCA Animation](http://setosa.io/ev/principal-component-analysis/)
+
+
+
+## Dummy Dataset
+
+```{r fig.height=5, fig.width=5, out.width="60%", fig.align='center'}
+par(pty="s")
+mu1 <- c(-1,0)
+mu2 <- c(1,0)
+sigma <- matrix(c(0.1,0, 0, 2), 2)  # Covariance matrix
+dummy <- rbind(mvrnorm(20, mu = mu1, Sigma = sigma),
+              mvrnorm(20, mu = mu2, Sigma = sigma))
+
+
+plot(dummy, pch = 19, col = rep(c("#4682B480","#8B000080"), each  =20), xlab = "Var a", ylab = "Var b", xlim = c(-3,3), ylim = c(-3,3))
+```
+
+> What LV will highlight the direction of maximal variance?
+
+## PCA of the dummy data
+
+```{r fig.height=5, fig.width=5, out.width="60%", fig.align='center'}
+par(pty="s")
+
+myPCA <- prcomp(x = dummy, center = TRUE)
+s <- seq(-10,10,0.5)
+pcadirection <- myPCA$rotation[,1]/sqrt(sum(myPCA$rotation[,1]^2))
+
+
+pcaprojections <-pcadirection %*% t(dummy)
+
+plot(dummy, pch = 19, col = rep(c("#4682B480","#8B000080"), each  =20), 
+     xlab = "Var a", ylab = "Var b", 
+     xlim = c(-3,3), ylim = c(-3,3))
+lines(s*myPCA$rotation[1,1], s*myPCA$rotation[2,1], col = "red", lwd = 2)
+points(pcaprojections*pcadirection[1], pcaprojections*pcadirection[2], col = rep(c("#4682B4","#8B0000"), each = 20), pch = 4, cex = 2)
+
+```
+\footnotesize
+* The red line represents the direction of maximal variance (bad separation!)
+* The crosses are the **scores** along this direction 
+
+## Loadings for PC1
+
+The loadings represent the weight of the initial variables along PC1
+
+* `Var a`: `r abs(pcadirection[1])`
+* `Var b`: `r abs(pcadirection[2])`
+
+## PCA uses
+
+* Visualization of multivariate data by scatter plots
+* Transformation of highly correlating x-variables into a smaller set of uncorrelated latent variables that can be used by other methods
+* Separation of relevant information (described by a few latent variables) from noise
+* Combination of several variables that characterize a chemical-technological-biological process into a single or a few "characteristic" variables
+* Make the “latent properties” actually measurable
+
+## PCA is sensitive to scaling and centering
+
+```{r fig.height=6, fig.width=8, fig.align='center'}
+par(pty="s", mfrow = c(1,2))
+
+## non mean centered and non scaled
+myPCA1 <- prcomp(x = bivn)
+s <- seq(-15,15,0.5)
+pca1direction <- myPCA1$rotation[,1]/sqrt(sum(myPCA1$rotation[,1]^2))
+pca1projections <-pca1direction %*% t(bivn)
+
+
+## mean centered and scaled
+myPCA2 <- prcomp(x = scale(bivn))
+pca2direction <- myPCA2$rotation[,1]/sqrt(sum(myPCA2$rotation[,1]^2))
+pca2projections <-pca2direction %*% t(scale(bivn))
+
+plot(bivn, pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-10,10), ylim = c(-10,10), main = "Raw")
+lines(s*myPCA1$rotation[1,1], s*myPCA1$rotation[2,1], col = "red", lwd = 2)
+points(pca1projections*pca1direction[1], pca1projections*pca1direction[2], col = "#8B0000", pch = 1)
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
+
+plot(scale(bivn), pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-10,10), ylim = c(-10,10), main = "Scaled and Centered")
+lines(s*myPCA2$rotation[1,1], s*myPCA2$rotation[2,1], col = "red", lwd = 2)
+points(pca2projections*pca2direction[1], pca2projections*pca2direction[2], col = "#8B0000", pch = 1)
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
+
+
+```
+
+## PCA is sensitive to outliers
+
+```{r fig.height=6, fig.width=8, fig.align='center'}
+par(pty="s", mfrow = c(1,2))
+
+bivn_out <- rbind(bivn,c(30,-30),c(25,-25))
+
+
+## non mean centered and non scaled
+myPCA3 <- prcomp(x = scale(bivn_out))
+s <- seq(-15,15,0.5)
+pca3direction <- myPCA3$rotation[,1]/sqrt(sum(myPCA3$rotation[,1]^2))
+pca3projections <-pca3direction %*% t(scale(bivn_out))
+
+
+plot(scale(bivn), pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-10,10), ylim = c(-10,10), main = "Scaled and Centered")
+lines(s*myPCA2$rotation[1,1], s*myPCA2$rotation[2,1], col = "red", lwd = 2)
+points(pca2projections*pca2direction[1], pca2projections*pca2direction[2], col = "#8B0000", pch = 1)
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
+
+plot(scale(bivn_out), pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-10,10), ylim = c(-10,10), main = "Outliers!")
+lines(s*myPCA3$rotation[1,1], s*myPCA3$rotation[2,1], col = "red", lwd = 2)
+points(pca3projections*pca3direction[1], pca3projections*pca3direction[2], col = "#8B0000", pch = 1)
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
+
+
+```
+
+## Notes
+
+* sensitivity to outliers is useful if PCA is used to spot them ;-)
+* *robust* version of PCA are available to keep all data in
+* PCA show the big “structure” of my data and this can help in interpretation
+* PCA will change if you add points !!!
+* The loadings are not always easy to interpret
+
+## PCA as a data model
+
+::: {.block}
+### Data Model
+PCA projects multidimensional data on a low dimensional subspace spanned by the LVs. This projection "models" the
+data. We could ask ourselves how good is this simplified representation.
+:::
+
+```{r fig.height=6, fig.width=8, out.width="80%", fig.align='center' }
+
+mu1 <- c(-1,1)                         # Mean
+sig1 <- matrix(c(0.05,0, 0,1), 2)  # Covariance matrix
+mu2 <- c(1,-1)
+sig2 <- matrix(c(1,0, 0,0.05), 2)
+mu3 <- c(0,0)
+sig3 <- matrix(c(1,0.5, 0.5,1), 2)
+
+xa <- mvrnorm(20, mu = mu1, Sigma = sig1)
+xb <- mvrnorm(20, mu = mu2, Sigma = sig2)
+
+
+x1 <- rbind(xa,xb)
+x1 <- x1[order(x1[,1]),]
+x2 <- mvrnorm(40, mu = mu3, Sigma = sig3)
+
+cornerPCA <- prcomp(x1, scale. = TRUE, center = FALSE)
+cloudPCA <- prcomp(x2, scale. = TRUE, center = TRUE)
+s <- seq(-5,5,0.5)
+
+
+par(pty="s", mfrow = c(1,2))
+plot(x1, pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-3,3), ylim = c(-3,3), main = "A")
+lines(cornerPCA$rotation[1,1]*s, cornerPCA$rotation[2,1]*s, col = "darkred", lwd = 2)
+
+
+plot(x2, pch = 19, col = "#4682B480", xlab = "Var a", ylab = "Var b", xlim = c(-3,3), ylim = c(-3,3), main = "B")
+lines(cloudPCA$rotation[1,1]*s, cloudPCA$rotation[2,1]*s, col = "darkred", lwd = 2)
+
+
+
+
+```
+
+## Number of Components
+
+::: {.block}
+### Model and components
+* a PCA with more components will represent better the data (is a better model)
+* a PCA with less components will be a more concise summary (is a model more parsimonious)
+* we have to strike a balance between complexity and goodness of fit
+:::
+
+* Graphical methods (e.g. scree plot): we want to cover a big part of the variance
+* Cross Validation
+
+
+## Scree plot
+
+```{r fig.height=5, fig.width=6, message=FALSE, warning=FALSE, out.width="80%", fig.align='center'}
+library(FactoMineR)
+library(factoextra)
+data(iris)
+
+irisPCA <- PCA(iris[,1:4],
+               scale.unit = TRUE,
+               graph = FALSE)
+
+fviz_screeplot(irisPCA, addlabels = TRUE)
+```
+
+## Cross Validation
+
+* A good data model should be able to represent well new data
+* I can simulate this by constructing the model on a subset of my samples and test its performance on the "leftover" samples
+* To assess the variability in the performance I do that several times
+
+```{r out.width="80%", fig.align='center'}
+include_graphics("images/CV.png")
+```
+
+##
+
+```{r, echo=FALSE, fig.align='center', out.width="90%"}
+include_graphics("images/live.jpg")
+```

@@ -19,8 +19,8 @@ PCA in R can be performed with many different packages, here we will use two of 
 
 Both packages are not part of the standard R installation. To directly install them just type
 ```{r eval=FALSE}
-install.packages("FactoMineR")
-install.packages("Factoextra")
+# install.packages("FactoMineR")
+# install.packages("Factoextra")
 ```
 
 
@@ -30,7 +30,7 @@ First of all we load the data and the two R packages
 ```{r}
 library(FactoMineR)
 library(factoextra)
-load("wines.RData")
+load("data/wines.RData")
 head(wines)
 ```
 
@@ -116,7 +116,7 @@ To finish this part let's give a fat look to the gene expression data ...
 
 ```{r}
 ## Load the data
-load("rnaseq.RData")
+load("data/rnaseq.RData")
 
 dim(countsn)
 

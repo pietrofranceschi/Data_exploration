@@ -136,7 +136,7 @@ As you can see the representation is slightly different. Could you look to the l
 ## Its your turn ...
 
 * Compare the outputs of the PCA analysis of the iris with the biplot of the initial variables. Is the picture coherent?
-* Run a PCA analysis on the wines dataset. There it is also interesting to play with the scaling of the data. Try, for example, to substitute the UV scaling with a log scaling or run PCA without scaling. What do you see
+* Run a PCA analysis on the wines dataset. There it is also interesting to play with the scaling of the data. Try, for example, to substitute the UV scaling with a log scaling or run PCA without scaling. What do you see?
 * Try to run the PCA analysis of the RNAseq data ... is it working?
 
 

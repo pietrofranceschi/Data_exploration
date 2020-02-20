@@ -1,7 +1,8 @@
 ---
 title: "Data Exploration - Introduction"
-author: "Pietro Franceschi"
-date: "11/02/2020"
+author: |
+  | Pietro Franceschi 
+  | pietro.franceschi@fmach.it
 institute: "FEM - UBC"
 
 output: 
