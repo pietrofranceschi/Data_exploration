@@ -1,7 +1,7 @@
 PCA
 ================
 Pietro Franceschi
-January 22, 2018
+June 6, 2020
 
 In this second demo we go really multivariate applying PCA to the
 analysis of some of the dataset we described in the univariate
@@ -33,7 +33,7 @@ library(factoextra)
 
     ## Loading required package: ggplot2
 
-    ## Welcome! Related Books: `Practical Guide To Cluster Analysis in R` at https://goo.gl/13EFCZ
+    ## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa
 
 ``` r
 data(iris)
@@ -140,20 +140,21 @@ fviz_screeplot(irisPCA, addlabels = TRUE)
 ![](figs/pcaunnamed-chunk-4-1.png)<!-- -->
 
 The graphical output tells us more or less what the text summary was
-suggesting. Two PCs should give a fair good picture of the data. Let’s
-look to the PCA scoreplot
+suggesting. Two PCs should give a fairly good picture of the data. Let’s
+look to the PCA scoreplot (the projection of the samples in the PCA
+plane)
 
 ``` r
 fviz_pca_ind(irisPCA, 
              habillage = iris$Species ,  ## use the specie as a color for the display
-             label = "none", # hide individual labels
-             repel = TRUE # Avoid text overlapping (slow if many points)
+             label = "none",             ## hide individual labels
+             repel = TRUE                ## Avoid text overlapping (slow if many points)
              )
 ```
 
 ![](figs/pcaunnamed-chunk-5-1.png)<!-- -->
 
-The plot show the position of the samples on the PC1 X PC2 plane. Each
+The plot shows the position of the samples on the PC1 X PC2 plane. Each
 point is a sample. The plot can be further customized. To do that look
 to the STHDA website mentioned earlier, or to the help of the function
 `help(fviz_pca_ind)`.
@@ -167,7 +168,8 @@ to the STHDA website mentioned earlier, or to the help of the function
 The scoreplot gives only “half” of the infos resulting from the PCA, in
 fact it shows only the position of the individuals. In real life
 applications, however, we are also interested in the contribution of the
-old variables to the PCs. This is the content of the loadingsplot
+variables we actually measured to the PCs. This is the content of the
+loadingsplot
 
 ``` r
 fviz_pca_var(irisPCA, col.var="contrib",
@@ -183,13 +185,13 @@ the contribution of the four initial variables on PC1 and PC2.
 Sepal.Width is important for PC2, while the other variables are more
 influential on PC1. Out of the “horizontal” three, Petal.Length is the
 one with the strongest weight on PC1. The direction of the arrows also
-tells that Petal.Width and Petal.Length are highly correlated (pointing
-on the same direction), while Sepal.Length and Sepal.Width are not
-correlated.
+tells that Petal.Width and Petal.Length are highly correlated (long
+arrows pointing on the same direction), while Sepal.Length and
+Sepal.Width are not correlated.
 
 On this aspect, however, remember that we are here looking only to a
 projection of the overall space and correlation/non correlation could
-arise only for projetive reasons.
+arise only for projective reasons.
 
 It is common to integrate the two previous plots into one single
 visualization called **biplot**
@@ -198,7 +200,8 @@ visualization called **biplot**
 fviz_pca_biplot(irisPCA, 
                 habillage = iris$Species,
                 label = "var", # show variable names
-                repel = TRUE)
+                repel = TRUE) + 
+  theme(aspect.ratio = 1)
 ```
 
 ![](figs/pcaunnamed-chunk-7-1.png)<!-- -->

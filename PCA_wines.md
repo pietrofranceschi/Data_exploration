@@ -1,9 +1,9 @@
 PCA
 ================
 Pietro Franceschi
-January 28, 2018
+June 7, 2020
 
-This demo still deals with PCA. In particular we apply it to the wines
+This demo still deals with PCA. In particular we apply it to the *wines*
 dataset.
 
 PCA in R can be performed with many different packages, here we will use
@@ -31,7 +31,7 @@ library(factoextra)
 
     ## Loading required package: ggplot2
 
-    ## Welcome! Related Books: `Practical Guide To Cluster Analysis in R` at https://goo.gl/13EFCZ
+    ## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa
 
 ``` r
 load("data/wines.RData")
@@ -58,6 +58,7 @@ also the info about the wine type
 
 ``` r
 winesdf <- cbind.data.frame(class = vintages, wines)
+## this command is useful to get a textual feedback on the structure of the data
 str(winesdf)
 ```
 
@@ -123,7 +124,8 @@ winesPCA.scaled <- PCA(winesdf[,2:14],
 fviz_pca_biplot(winesPCA.scaled, 
                 habillage = winesdf$class,
                 label = "var", # show variable names
-                repel = TRUE) 
+                repel = TRUE,
+                title = "Scaled Data") 
 ```
 
 ![](figs/pcawinesunnamed-chunk-5-1.png)<!-- -->
@@ -136,14 +138,15 @@ winesPCA <- PCA(winesdf[,2:14],
 fviz_pca_biplot(winesPCA, 
                 habillage = winesdf$class,
                 label = "var", # show variable names
-                repel = TRUE) 
+                repel = TRUE,
+                tile = "unscaled Data") 
 ```
 
 ![](figs/pcawinesunnamed-chunk-6-1.png)<!-- -->
 
 Now some questions:
 
-  - What can you see about the sample wines?
+  - What can you see about the samples?
   - What can you say about the relations (correlation) between the
     variables?
   - Which are the most discriminating variables?
@@ -158,7 +161,8 @@ stripchart(winesdf[,2:14],
            jitter = 0.2,
            pch = 19,
            col = "red3",
-           cex = 0.3)
+           cex = 0.3, 
+           las = 2, cex.axis=0.7)
 ```
 
 ![](figs/pcawinesunnamed-chunk-7-1.png)<!-- -->
@@ -172,7 +176,8 @@ stripchart(as.data.frame(scale(winesdf[,2:14])),
            jitter = 0.2,
            pch = 19,
            col = "red3",
-           cex = 0.3)
+           cex = 0.3,
+           las = 2, cex.axis=0.7)
 abline(h=0)
 ```
 
@@ -185,7 +190,6 @@ To finish this part let’s give a fat look to the gene expression data …
 ``` r
 ## Load the data
 load("data/rnaseq.RData")
-
 dim(countsn)
 ```
 

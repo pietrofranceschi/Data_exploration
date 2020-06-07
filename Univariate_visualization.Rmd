@@ -105,7 +105,7 @@ stripchart(iris[,1:4],                     ## only the variables
            vertical = TRUE,                ## mke the plot vertical
            method = "jitter",              ## jitter the points in x
            col = "coral",                  ## another color
-           pch = 19,                       ## plotting symbol!
+           pch = 1,                       ## plotting symbol!
            cex = 0.7)                      ## size
 ```
 

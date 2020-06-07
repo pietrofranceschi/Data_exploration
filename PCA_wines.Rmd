@@ -1,18 +1,17 @@
 ---
 title: "PCA"
 author: "Pietro Franceschi"
-date: "January 28, 2018"
+date: "June 7, 2020"
 output: rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(
-  fig.path = "figs/pcawines"
-)
+  fig.path = "figs/pcawines")
 ```
 
-This demo still deals with PCA. In particular we apply it to the wines dataset.
+This demo still deals with PCA. In particular we apply it to the *wines* dataset.
 
 PCA in R can be performed with many different packages, here we will use two of them which are characterized by an optimal trade off between flexibility and ease to use. The two packages are `FactoMineR` and `factoextra`. An excellent introduction to their use can be found [there](http://www.sthda.com/english/wiki/factoextra-r-package-easy-multivariate-data-analyses-and-elegant-visualization)
 
@@ -40,6 +39,7 @@ Since this `wines` is a matrix, we transform it to a data frame adding also the 
 
 ```{r}
 winesdf <- cbind.data.frame(class = vintages, wines)
+## this command is useful to get a textual feedback on the structure of the data
 str(winesdf)
 ```
 
@@ -59,7 +59,8 @@ winesPCA.scaled <- PCA(winesdf[,2:14],
 fviz_pca_biplot(winesPCA.scaled, 
                 habillage = winesdf$class,
                 label = "var", # show variable names
-                repel = TRUE) 
+                repel = TRUE,
+                title = "Scaled Data") 
 ```
 
 ```{r}
@@ -70,12 +71,13 @@ winesPCA <- PCA(winesdf[,2:14],
 fviz_pca_biplot(winesPCA, 
                 habillage = winesdf$class,
                 label = "var", # show variable names
-                repel = TRUE) 
+                repel = TRUE,
+                tile = "unscaled Data") 
 ```
 
 Now some questions:
 
-* What can you see about the sample wines? 
+* What can you see about the samples? 
 * What can you say about the relations (correlation) between the variables?
 * Which are the most discriminating variables?
 * Why the two previous plots are so different?
@@ -83,14 +85,15 @@ Now some questions:
 
 Let's give a look to the scaled and unscaled raw data ...
 
-```{r}
+```{r fig.width=6}
 stripchart(winesdf[,2:14],
            vertical = TRUE,
            method = "jitter",
            jitter = 0.2,
            pch = 19,
            col = "red3",
-           cex = 0.3)
+           cex = 0.3, 
+           las = 2, cex.axis=0.7)
 ```
 
 
@@ -104,7 +107,8 @@ stripchart(as.data.frame(scale(winesdf[,2:14])),
            jitter = 0.2,
            pch = 19,
            col = "red3",
-           cex = 0.3)
+           cex = 0.3,
+           las = 2, cex.axis=0.7)
 abline(h=0)
 ```
 
@@ -117,7 +121,6 @@ To finish this part let's give a fat look to the gene expression data ...
 ```{r}
 ## Load the data
 load("data/rnaseq.RData")
-
 dim(countsn)
 
 ```
@@ -150,7 +153,6 @@ fviz_pca_biplot(genesPCA,
 ```
 
 
-
 Olalà! 
 
 * Why this plot? 
@@ -158,6 +160,7 @@ Olalà!
 * Is something unexpected?
 
 ## Projections
+
 We mentioned that to compare new and old data by PCA the "new" samples should be projected on the old PCA, otherwise the projection plane will be different. This is the most wise way to assess if new samples are compatible with the old ones. Let's see how this can be done on the wines dataset.
 
 To this purpose we project the "Barolo" samples on the PCA costructed on the rest of the dataset

@@ -234,6 +234,7 @@ The aim of PCA is dimension reduction and PCA is the most frequently applied met
 
 ### PCA
 The transformation is defined in such a way way that the first principal component has the **largest possible variance** (that is, accounts for as much of the variability in the data as possible), and each succeeding component in turn has the highest variance possible under the constraint that it is **orthogonal** to the preceding components.
+
 * In PCA the “objective” of the projection is to maximize variance
 * PCA “view” will enhance the spread of the data
 * The key idea is that **variability means information** 
