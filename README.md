@@ -14,7 +14,7 @@ Material for the practical sessions of the Data Exploration Course
 [PCA on the Wines](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/PCA_wines.md)
 
 ## Clustering
-[Clustering](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/clustering.md)
+[Clustering](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/clustering_demo.md)
 
 ## False Discovery Rate
 [FDA](https://github.com/pietrofranceschi/CIBIO_Phd_course_2018/blob/master/FDR.md)
