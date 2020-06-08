@@ -25,8 +25,12 @@ library(ggpubr)
 ## Clustering
 
 ### Clustering
-The term ‘‘cluster’’ has the meaning of ‘‘concentrated’’ group. It usually refers to the objects (in the variable space), but is also used for variables (in the space of the objects), or for both, variables and objects simultaneously.
+The term ‘‘cluster’’ has the meaning of ‘‘concentrated’’ group. It usually refers to the objects (in the variable space), but is also used for variables (in the space of the objects), or for both, variables and objects simultaneously. 
 
+::: {.block}
+### In a nutshell
+Cluster analysis tries to find groups containing similar objects, it is thus a method for **UNSUPERVISED LEARNING**
+:::
 
 
 ## Key Ideas
@@ -37,6 +41,18 @@ The term ‘‘cluster’’ has the meaning of ‘‘concentrated’’ group. 
 * The right “similarity” depends on the problem
 * The similarity measure gives high freedom
 * ... one can use it to look for a specific result ...
+
+## Methods
+
+:::{.block}
+
+* HIERARCHICAL METHODS : Objects and partitions are arranged in a hierarchy. An appropriate graphical representation of the result is a tree-like dendrogram. It allows to determine manually the ‘‘optimal’’ number of clusters as well as to see the hierarchical relations between different groups of objects
+* PARTITIONING METHODS : Each object is assigned to exactly one group
+* FUZZY CLUSTERING METHODS : Each object is assigned by a membership coefficient to each of the found clusters. Usually, the membership coefficients are normalized to fall in the interval [0, 1], and thus they can be interpreted as probability that an object is assigned to anyone of the clusters
+* MODEL-BASED CLUSTERING : The different clusters are supposed to follow a certain model, like a multivariate normal distribution with a certain mean and covariance
+
+:::
+
 
 ## Similarity and Distance
 
@@ -63,6 +79,15 @@ include_graphics("images/taxicab.png")
 
 * red, yellow and blue lines have the same taxicab distance
 * in euclidean metric the green is the unique shortest path
+
+
+## Clustering the Variables
+
+Most of the standard clustering algorithms can be directly used for **clustering the variables**. In this case, the "distance between the variables" rather than between the objects has to be measured. A popular choice is the **Pearson correlation Distance**
+
+$$
+d_{CORR}(v_{j},v_{k}) = 1 - \mid r_{ik} \mid
+$$
 
 
 ## Common Questions
@@ -218,12 +243,6 @@ include_graphics("images/kmeans.png")
 * *k-means* algorithm tends to be sensitive to outliers. A more robust alternative is **k-medoids**
 
 
-##
-
-```{r, echo=FALSE, fig.align='center', out.width="100%"}
-include_graphics("images/live.jpg")
-```
-
 
 ## Is my dataset really clustered?
 
@@ -238,6 +257,9 @@ Before applying any clustering method on your data, it’s important to evaluate
 
 Is the distribution of the distance among the different objects different from the one I would obtain for randomly distributed data in the same space?
 
+Data compatible with a random distribution will get $H\sim0.5$. Higher values are suggesting the presence of clusters
+
+\vspace{2em}
 
 *Nice idea … but I really need a substantial amount of points  ;-)*
 
@@ -270,7 +292,7 @@ ggarrange(m1,m2, ncol = 2, nrow = 1)
 
 If my data show a tendency to cluster, we need to to find the "best" number of clusters here we list three possible approaches:
 
-* monitor the **within cluster sum of squares** as a function of the number of clusters
+* monitor the **within cluster sum of squares (WSS)** as a function of the number of clusters
 * inspect the **silhouette** plot
 * calculate the **Dunn Index** as a function of the number of clusters
 
@@ -313,8 +335,52 @@ $$
 D = \frac{min.separation}{max.diameter}
 $$
 
+
+## Fuzzy Clustering
+
+**Fuzzy clustering** allows for a _fuzzy_ assignment meaning that an observation is not assigned to exclusively one cluster but at some part to all clusters by calculating a "membership"
+
+\vspace{1em}
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/fuzzy.png")
+```
+
+
+
+
+## Model Based Clustering
+
+**Model-based clustering** assumes a statistical model of the clusters.
+
+\vspace{1em}
+
+Each cluster is supposed to be represented by a statistical distribution, like the multivariate normal distribution, with certain parameters for mean and
+covariance.
+
+```{r, echo=FALSE, fig.align='center', out.width="60%"}
+include_graphics("images/modelbased.png")
+```
+
+
+
 ##
 
 ```{r, echo=FALSE, fig.align='center', out.width="100%"}
 include_graphics("images/live.jpg")
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

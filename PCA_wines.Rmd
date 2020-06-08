@@ -64,7 +64,7 @@ fviz_pca_biplot(winesPCA.scaled,
 ```
 
 ```{r}
-winesPCA <- PCA(winesdf[,2:14],
+winesPCA <- PCA(log10(winesdf[,2:14]),
                 scale.unit = FALSE,
                 graph = FALSE
                 ) 
