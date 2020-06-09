@@ -71,6 +71,13 @@ $$
 d(x,y) \leq d(x,z) + d(z,y)
 $$
 
+### Clustering and Scaling
+
+When we rely on a distance measure the result will be heavily **depending on scaling**
+
+
+
+
 ## Flexibility
 
 ```{r, echo=FALSE, fig.align='center', out.width="50%"}
@@ -92,7 +99,7 @@ $$
 
 ## Common Questions
 
-###
+### ????
 
 * Are my data really clustered?
 * What type of clustering should I use?
