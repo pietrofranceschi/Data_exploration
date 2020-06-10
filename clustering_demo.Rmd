@@ -132,7 +132,7 @@ toy.complete <- hclust(toy.dist)
 fviz_dend(toy.complete,
           cex = 0.5,       ## size of the text
           k = 2,
-          rect = TRUE) + scale_color_brewer(palette = "Set1")
+          rect = TRUE) 
 ```
 
 As expected, in this easy example, the dendrogram shows two clear groups, which coincide with the initial classes. 
@@ -215,7 +215,7 @@ Another possibility is to use the "Silhouette"
 
 
 ```{r}
-km.toy <- eclust(toydata, "kmeans", k = 3, nstart = 25, graph = FALSE)
+km.toy <- eclust(toydata, "kmeans", k = 2, nstart = 50, graph = FALSE)
 ```
 
 
@@ -349,7 +349,7 @@ fviz_nbclust(iris.scaled, kmeans, method = "wss")
 The situation here is less clear then before ... 2,3 or 4 clusters ?
 
 ```{r}
-km.iris <- kmeans(iris.scaled, 3, nstart = 50)
+km.iris <- kmeans(iris.scaled, 4, nstart = 50)
 
 table(km.iris$cluster,iris$Species)
 ```

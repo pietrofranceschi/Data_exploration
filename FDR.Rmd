@@ -1,7 +1,7 @@
 ---
-title: "Clustering"
+title: "False Discovery Rate"
 author: "Pietro Franceschi"
-date: "January 28, 2018"
+date: "June 10, 2020"
 output: rmarkdown::github_document
 ---
 
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 
 
 # Multiple testing 
-As we discussed, we call "statistical testing" the framework that allows us to measure the confidence of some hypothesis we are making on the data. As always we would like to be able to derive general conclusions of **scientific** value, but unfortunately we are observing only a subset of the population, and it can be that strange7interesting phenomena happens only by chance.
+As we discussed, we call "statistical testing" the framework that allows us to measure the confidence of some hypothesis we are making on the data. As always we would like to be able to derive general conclusions of **scientific** value, but unfortunately we are observing only a subset of the population, and it can be that strange/interesting phenomena happens only by chance.
 
 ## Random differences
 Let's consider a comparison of 10 vs 10 samples extracted from the same population
@@ -56,7 +56,7 @@ hist(ps, col = "steelblue", main = "p-vals", breaks = 100)
 ```
 
 * we have always low p-values
-* we have "true" differences by chance 
+* we have "true" differences by chance ... remember that they are true! 
 * we cannot conclude that the two groups are different!
 
 
@@ -65,7 +65,7 @@ hist(ps, col = "steelblue", main = "p-vals", breaks = 100)
 The dataset contains the results of a metabolomics investigation which was looking to the differences between yellow and red raspberries. 
 
 ```{r}
-load("rubusFilledSmall.RData")
+load("data/rubusFilledSmall.RData")
 
 ## size of the dataset
 dim(rubusFilledSmall)
@@ -93,7 +93,7 @@ and now the histogram ...
 
 
 ```{r}
-hist(ps, col = "steelblue", main = "p-vals", breaks = 20)
+hist(ps, col = "steelblue", main = "p-vals", breaks = 40)
 ```
 
 what we see here is that above a uniform background of uniform p-values, there is a clear increase of low p-values. Some important observations on that
@@ -114,7 +114,7 @@ for(i in 1:500){
 
 }
 
-hist(ps1, col = "steelblue", main = "p-vals", breaks = 20)
+hist(ps1, col = "steelblue", main = "p-vals", breaks = 40)
 
 ```
 

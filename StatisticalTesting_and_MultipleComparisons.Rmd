@@ -1,0 +1,453 @@
+---
+title: "Statistical Testing and Multiple Comparisons"
+author: |
+  | Pietro Franceschi 
+  | pietro.franceschi@fmach.it
+institute: "FEM - UBC"
+
+output: 
+  beamer_presentation:
+    theme: "Warsaw"
+    colortheme: "orchid"
+    incremental: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(knitr)
+library(tidyverse)
+library(ggpubr)
+```
+
+## Fact sheet
+
+:::::::::::::: {.columns}
+::: {.column width="60%"}
+
+* **Scientific results** should be of _general validity_
+* We **infer** general results from limited number of observations
+* **Variability** is unavoidable ad can be big
+* Due to **Variability** interesting can be the results of chance 
+
+:::
+::: {.column width="40%"}
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/Facts.png")
+```
+
+:::
+::::::::::::::
+
+## The common shape of variability
+
+* What we observe is the result of a "chain" of processes (e.g. gene $\rightarrow$ protein $\rightarrow$ metabolite)
+* We never observe only one chain (e.g we consider *many* people with similar metabolism)
+* The fact that we have noise on the "chain" produces variability in the output
+* This variability has a bell shaped profile, which is more often than not **Gaussian**
+* We have to measure more than once ;-)
+
+## Coin toss
+
+The distribution of the outcomes of 50 tosses of the same coin
+
+
+```{r, out.width="50%", fig.align='center'}
+sample.space <- c(0,1)
+
+flips <- sample(sample.space,
+                size = 50,
+                replace = TRUE,
+                prob = c(0.5, 0.5))
+
+foo <- hist(flips, col = "steelblue", main = "50 flips", xaxt="n")
+axis(side=1,at=c(0.1,0.9),labels=c("T","C"))
+
+```
+
+This "biological" process is clearly non normally distributed, but has variability
+
+## Sum of 50 coin tosses
+
+Suppose that now my "biological" process is the result of the sum of 50 coin tosses where T counts as 1 and C as 0. What is the distribution of the results of 500 sums?
+
+```{r, out.width="50%", fig.align='center'}
+sample.space <- c(0,1)
+
+sums <- rep(0,500)
+
+for(i in 1:500){
+  sums[i] <- sum(sample(sample.space,
+                size = 50,
+                replace = TRUE,
+                prob = c(0.5, 0.5)))
+}
+
+
+
+hist(sums, col = "steelblue", main = "50 flips", xlab = "Sum")
+
+```
+
+Here the "biological" process yields normally distributed data!
+
+
+## Example 
+
+* Let's consider a property (concentration of a metabolite, physical measure, ...) normally distributed in the population (mean = 150, standard deviation = 20).
+* Let's repeatedly extract two groups of three samples from the population 
+* Let's consider the difference between the means of the two groups ...
+
+```{r out.width="50%", fig.align='center'}
+curve(dnorm(x, mean = 150, sd = 20), 250 ,col = "steelblue", lwd = 4, ylab = "density", xlab = "metabolite concentration")
+
+```
+
+
+## Distribution of the differences
+
+```{r}
+diffmeans <- rep(0,500)
+
+for(i in 1:500){
+  a <- rnorm(3,150,20)
+  b <- rnorm(3,150,20)
+  diffmeans[i] <- mean(a) - mean(b)
+}
+
+
+hist(diffmeans, col = "steelblue", xlim = c(-100,100), breaks = seq(-70,70,2))
+
+```
+
+##
+
+::: {.block}
+### Observations
+
+* The histogram is centered around zero ...
+* We can get differences as large as 50
+* 50 is 1/3 of the population mean
+* **Bad Luck** is unavoidable
+
+:::
+
+```{r, echo=FALSE, fig.align='center', out.width="40%"}
+include_graphics("images/luck.jpg")
+```
+
+
+## The same holds
+
+
+
+* Biomarkers
+* Clusters
+* Variable correlations
+* ...
+* Any type of potentially interesting result
+
+
+
+## More samples ...
+
+```{r}
+diffmeans <- rep(0,500)
+
+for(i in 1:500){
+  a <- rnorm(30,150,20)
+  b <- rnorm(30,150,20)
+  diffmeans[i] <- mean(a) - mean(b)
+}
+
+
+hist(diffmeans, breaks = seq(-70,70,2), col = "steelblue", xlim = c(-100,100))
+
+```
+
+## 
+
+::: {.block}
+### What can we do ...
+
+* Forget the problem and live in peace
+* Enlarge the sample size ... yes but
+* Develop a framework that allows us to **quantify** our level of **confidence** on the fact that our results are true in general
+
+:::
+
+
+\color{red}
+
+This process is called **Statistical Testing**
+
+
+## Statistical Testing
+
+* Identify the **property** and the quantity (**statistic**) we can measure on the samples which connected to that property (Eg. mean, range, minimum value, ecc ...)
+* Define the **question** in terms of this property (e.g. the mean of the property in treated and control samples is different)
+* Assume that what we observe is **the results of chance alone** (Null Hypothesis or H0)
+* Calculate the probability of observing (at least)  what we see only by chance (**p-value**) 
+* Set a reasonable threshold on that probability (0.05, 0.01, ...)
+* Decide if H0 is sufficiently unlikely so it can be rejected 
+
+
+## Example: lowering cholesterol
+
+* Suppose that the level of cholesterol in the population is normally distributed with mean 200 and standard deviation 50
+* We claim that a new secret drug reduces significantly the cholesterol level in the population
+* To prove that we get a sample of 50 people, we treat them with the drug and we measure their cholesterol 
+
+\vspace{2em}
+\color{blue}
+
+Can we test if this pilot study supporting our claim?
+
+## Let's test that! 
+
+* We chose the **mean** level of cholesterol as the statistic to be tested. The mean level of cholesterol in our group is 193
+* The question. Is the observed mean  **sufficiently different** from the population mean?
+* We suppose that the **drug has no effect (H0)**, so my 50 people are a random draw from the population and a mean value of 193 is obtained only by chance
+
+## 
+
+* We **calculate the distribution** of the mean level of cholesterol on groups of 50 people (it is not the distribution of cholesterol!) randomly drawn from the population
+* We **calculate the probability** of obtaining at least the observed value (p-value) from this distribution
+* We reject the null hypothesis if the p-value is lower than the selected threshold
+
+## Let's plot it!
+
+```{r out.width="100%", fig.align='center'}
+means50 <- rep(0,100)
+
+set.seed(123)
+
+for(i in (1:100)){
+  means50[i] <- mean(rnorm(50,200,50))
+}
+
+
+mycols <- rep("#C8081570",100)
+mycols[means50 < 193] <- "#377eb870"
+
+plot(x = 1:100, means50, ylim = c(150, 250), pch = 19, col = mycols, 
+     ylab = "mean of 50 individuals", xlab = "Replicated sampling from theoretical population")
+abline(h = 193, col = "steelblue", lty = 2)
+abline(h = 200, col = "darkred")
+
+```
+
+
+## What we see
+
+* The distribution of the means is centered around the population mean!
+* The blue line represents the mean of my 50 people
+* Blue points represent samples of 50 people showing, by chance, a mean level of cholesterol lower than 193
+* Apparently getting at least that value only by chance is not extremely unlikely ... 14 blue dots out of 100 (0.14 !)
+* I cannot reject H0 at the 0.05 level ...
+
+## 
+
+:::::::::::::: {.columns}
+::: {.column width="60%"}
+
+\vspace{2em}
+
+* We are **never** sure
+* ... even if the threshold is small
+* The threshold is **arbitrary**
+* Correct phrasing : __"my result is significant at the 0.05 level of confidence"__
+* It is fair to change the threshold!
+
+:::
+::: {.column width="40%"}
+
+```{r, echo=FALSE, fig.align='center', out.width="80%"}
+include_graphics("images/importantsign.png")
+```
+
+:::
+::::::::::::::
+
+## Key point
+
+::: {.block}
+To calculate the p-value we need to know or estimate the distribution of the statistics we are testing under the null hypothesis
+
+:::
+
+* A priori knowledge
+* Estimation from the data ()
+* Brute force (e.g. permutation) leading to an **empirical** estimation of the p-value
+
+
+## t-statistics
+
+Let $\widehat{\beta}$ be an estimator of parameter $\beta$ in some statistical model. Then a _t_-statistic for this parameter is any quantity of the form
+
+$$
+t_{\widehat{\beta}} = \frac{\widehat{\beta} - \beta_{0}}{s.e.(\widehat{\beta})}
+$$
+
+Where $\beta_{0}$ is a known constant, $\widehat{\beta}$ is the estimate of the parameter and $s.e.(\widehat{\beta})$ is the standard error of the estimate.
+
+Student t-test
+
+$$
+t = \frac{\bar{X}-\mu}{\widehat{\sigma}/\sqrt{n}}
+$$
+
+
+\color{blue}
+
+_t_ statistic follows a _t_ distribution
+
+##
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/live.jpg")
+```
+
+## Back to our magic drug ...
+
+Unfortunately it turns out that our drug is not so good ... apparently it reduces the cholesterol of 0.01%
+
+```{r}
+
+samp_serie <- rep(c(5,50,500,5000,50000), each = 100)
+group_means <- rep(0,length(samp_serie))
+
+for(i in 1:length(samp_serie)){
+  group_means[i] <- mean(rnorm(samp_serie[i],200,50))
+}
+
+
+mycols1 <- rep("#C8081570",500)
+mycols1[group_means < 198] <- "#377eb870"
+
+
+
+plot(x = 1:length(samp_serie), group_means, ylim = c(150, 250), pch = 19, col = mycols1, cex = 0.7,
+     ylab = "mean of 50 individuals", xlab = "Replicated sampling from theoretical population", xaxt="n")
+abline(h = 198, col = "steelblue", lty = 2)
+abline(h = 200, col = "darkred")
+abline(v = c(0,100,200,300,400), col = "gray80")
+
+```
+
+## Do we always need statistics?
+
+* Is a reduction of 0.01% really useful
+* Placing an individual within his/her reference population is not a statistical problem
+* Big number of samples will make tiny differences statistically significant!
+* Statistical significance is not biological/medical significance
+* The *p-value* alone cannot be used to judge the relevance of a research ...
+
+## Performing more than one test
+
+:::::::::::::: {.columns}
+::: {.column width="60%"}
+
+With the advent of high throughput _omics_, more often than not the samples are characterized by **multiple measures** (e.g. metabolites, proteins, sensors) so what one want to **test is an hypothesis over a (large) set of variables**
+
+\vspace{2em}
+
+\color{blue}
+e.g: I'm measuring 1000 metabolites in two groups of samples. Are they different in **at least one metabolite?**
+
+:::
+::: {.column width="40%"}
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/Facts.png")
+```
+
+:::
+::::::::::::::
+
+## 
+
+:::::::::::::: {.columns}
+::: {.column width="60%"}
+
+
+\vspace{7em}
+
+What would be better than take the machinery and run it 1000 times on the different metabolites?
+
+:::
+::: {.column width="40%"}
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/takeiteasy.jpeg")
+```
+
+:::
+::::::::::::::
+
+## Always a dummy dataset ...
+
+
+:::::::::::::: {.columns}
+::: {.column width="60%"}
+
+\vspace{3em}
+
+* 20 samples
+* 2 classes
+* 1000 variables
+* random numbers, **no difference**
+
+:::
+::: {.column width="40%"}
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/dice.jpg")
+```
+
+:::
+::::::::::::::
+
+
+## distribution of p-values
+
+```{r}
+
+ps <- rep(0,1000)
+
+for(i in 1:1000){
+  s1 <- rnorm(10)
+  s2 <- rnorm(10)
+  test <- t.test(s1,s2)
+  ps[i] <- test$p.value
+}
+
+hist(ps, col = "orange", breaks = 50)
+abline(v = 0.05, col = "steelblue", lty = 2, lwd = 2)
+
+```
+
+## What we see
+
+* p-values are uniformly distributed
+* we also have significant differences at the 0.05 level
+* Bad luck ;-) !
+* Since here I have no differences the distribution of p-values under H0 is uniform
+
+## What can we do?
+
+* forget the problem and live in peace ;-)
+* reduce the threshold of significance dividing it by the number of tests **Bonferroni** correction
+* accept the presence of a fraction of _false positives_ tests. This approach is called **False Discovery Rate** control
+
+##
+
+```{r, echo=FALSE, fig.align='center', out.width="100%"}
+include_graphics("images/live.jpg")
+```
+
+
+
+
+
